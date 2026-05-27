@@ -1,0 +1,48 @@
+{
+  "createLine": {
+    "metadata": {
+      "title": "Create a Line - LineME",
+      "description": "Create a digital queue with live capacity, wait time, and notification settings."
+    },
+    "back": "Back home",
+    "eyebrow": "Line setup",
+    "title": "Create a line that is ready to manage.",
+    "subtitle": "Set the basics, choose how people join, and publish a live queue code your visitors can use right away.",
+    "submit": "Create line",
+    "created": "Line draft is ready",
+    "minutes": "min",
+    "people": "people",
+    "defaults": {
+      "lineName": "Downtown Clinic",
+      "location": "Counter 4"
+    },
+    "fields": {
+      "lineName": "Line name",
+      "location": "Location or counter",
+      "queueType": "Line type",
+      "estimatedMinutes": "Average service time",
+      "capacity": "Daily capacity",
+      "autoNotify": "Notify people automatically",
+      "allowPause": "Allow pausing intake"
+    },
+    "types": {
+      "clinic": "Clinic",
+      "restaurant": "Restaurant",
+      "service": "Service",
+      "event": "Event"
+    },
+    "preview": {
+      "label": "Live preview",
+      "live": "Ready",
+      "averageWait": "Average wait",
+      "capacity": "Capacity",
+      "type": "Type",
+      "lineCode": "Line code",
+      "copy": "Copy line code",
+      "notifyOn": "Automatic updates enabled",
+      "notifyOff": "Automatic updates disabled",
+      "pauseOn": "Managers can pause intake",
+      "pauseOff": "Intake stays open"
+    }
+  }
+}

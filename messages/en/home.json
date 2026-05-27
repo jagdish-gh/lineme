@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "title": "LineME - Queue Management App",
+    "description": "Skip physical waiting. Join and manage queues digitally in real time."
+  },
+  "hero": {
+    "eyebrow": "Real-time queue management",
+    "title": "Welcome to LineME",
+    "subtitle": "Skip physical waiting. Join and manage queues digitally in real time.",
+    "primaryCta": "Join the Line",
+    "secondaryCta": "Create a Line",
+    "status": "Live now",
+    "waitTime": "Avg. wait",
+    "peopleAhead": "People ahead",
+    "managedToday": "Lines managed today"
+  },
+  "queueCard": {
+    "title": "Downtown Clinic",
+    "counter": "Counter 4",
+    "next": "Next up",
+    "joined": "You joined 2 min ago",
+    "notify": "Notification enabled"
+  },
+  "features": {
+    "join": {
+      "title": "Join instantly",
+      "description": "Enter a code, see your position, and arrive when it matters."
+    },
+    "manage": {
+      "title": "Manage clearly",
+      "description": "Call the next person, pause intake, and watch demand in real time."
+    },
+    "updates": {
+      "title": "Stay informed",
+      "description": "Send accessible updates that keep everyone aligned without crowding."
+    }
+  }
+}

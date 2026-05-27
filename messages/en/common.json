@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "manage": "Manage queues",
+    "join": "Join queue",
+    "create": "Create queue",
+    "menu": "Open menu",
+    "close": "Close menu",
+    "language": "Language",
+    "theme": "Theme",
+    "logo": "LineME home"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  }
+}
