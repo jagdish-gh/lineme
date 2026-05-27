@@ -1,0 +1,38 @@
+{
+  "privacy": {
+    "metadata": {
+      "title": "Privacy Policy - LineME",
+      "description": "Learn how LineME handles queue, visitor, and account information."
+    },
+    "eyebrow": "Privacy policy",
+    "title": "Privacy Policy",
+    "intro": "This policy explains how LineME handles information when teams create queues and visitors join them. It is written to be clear, practical, and easy to update as the product grows.",
+    "effectiveDate": "Effective date: May 27, 2026",
+    "sections": {
+      "information": {
+        "title": "Information we collect",
+        "body": "LineME may collect queue names, locations, join codes, visitor position details, manager account details, and contact information when it is needed for notifications or support."
+      },
+      "usage": {
+        "title": "How we use information",
+        "body": "We use information to create and manage queues, show live positions, estimate wait times, send service updates, improve reliability, and protect the app from misuse."
+      },
+      "sharing": {
+        "title": "When information is shared",
+        "body": "We do not sell personal information. Information may be shared with service providers that help operate LineME, such as hosting, authentication, analytics, email, or SMS delivery."
+      },
+      "retention": {
+        "title": "How long we keep information",
+        "body": "Queue activity should be kept only as long as needed for operations, audit, support, or legal requirements. Future account settings should allow teams to control retention where practical."
+      },
+      "choices": {
+        "title": "Your choices",
+        "body": "Visitors can choose not to provide optional contact details, though some notifications may not work without them. Managers can request updates or deletion of account information by contacting support."
+      },
+      "contact": {
+        "title": "Contact",
+        "body": "For privacy questions, contact LineME at {email}."
+      }
+    }
+  }
+}

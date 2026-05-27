@@ -1,9 +1,10 @@
 import { defaultLocale, locales, type Locale } from "@/i18n/routing";
+import { brand } from "@/lib/brand";
 
 export const siteConfig = {
-  name: "LineME",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://lineme.app",
-  creator: "LineME",
+  name: brand.name,
+  url: brand.url,
+  creator: brand.name,
   keywords: [
     "queue management app",
     "digital queue",

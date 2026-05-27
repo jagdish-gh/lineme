@@ -13,5 +13,25 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "footer": {
+    "logo": "LineME home",
+    "description": "LineME helps teams create calm, digital queues so visitors can wait from anywhere and arrive at the right moment.",
+    "product": "Product",
+    "contact": "Contact",
+    "legal": "Legal",
+    "availability": "Built for clinics, service counters, restaurants, and local teams that need simple real-time line management.",
+    "tagline": "Digital queues, calmer spaces.",
+    "copyright": "© {year} LineME. All rights reserved.",
+    "links": {
+      "join": "Join a queue",
+      "create": "Create a queue",
+      "manage": "Manage queues",
+      "privacy": "Privacy policy"
+    },
+    "badges": {
+      "secure": "Privacy minded",
+      "local": "Made for everyday teams"
+    }
   }
 }
