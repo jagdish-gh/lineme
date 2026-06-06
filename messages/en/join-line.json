@@ -1,0 +1,114 @@
+{
+  "joinLine": {
+    "metadata": {
+      "title": "Join a queue - LineME",
+      "description": "Find a LineME queue by code, shared link, or QR code and join from your phone."
+    },
+    "eyebrow": "Join without an account",
+    "title": "Find and join your line",
+    "description": "Enter the 10-character line code, open a shared LineME link, or scan the QR code provided by the team.",
+    "search": {
+      "title": "Enter a line code",
+      "description": "Use the code displayed by the business or sent to you.",
+      "label": "Line code",
+      "placeholder": "XXXXXXXXXX",
+      "button": "Find line"
+    },
+    "sharedLink": {
+      "title": "Open a shared link",
+      "description": "Shared links open the correct line automatically. No code entry is needed."
+    },
+    "qr": {
+      "title": "Scan a QR code",
+      "description": "Use your phone camera to scan the LineME QR code at the location."
+    },
+    "scanner": {
+      "start": "Open QR scanner",
+      "pointCamera": "Point the camera at the QR code",
+      "close": "Close scanner",
+      "videoLabel": "QR code camera preview",
+      "unsupportedTitle": "QR scanning is not supported here",
+      "unsupportedDescription": "Open the shared link or enter the line code above.",
+      "errorTitle": "Camera could not be opened",
+      "errorDescription": "Allow camera access and try again, or enter the line code."
+    },
+    "empty": {
+      "title": "Your line will appear here",
+      "description": "Search with a code or scan a QR code to review the line before joining."
+    },
+    "saved": {
+      "title": "Lines you already joined",
+      "description": "These private tickets are saved in this browser.",
+      "open": "View ticket",
+      "back": "Back to joined lines",
+      "refresh": "Refresh position"
+    },
+    "leave": {
+      "title": "Leave this line?",
+      "button": "Leave line",
+      "cancel": "Keep my place",
+      "leaving": "Leaving...",
+      "confirm": "Leave {name}? Your ticket will be cancelled and removed from this browser."
+    },
+    "extraInfo": {
+      "title": "The team needs more information",
+      "placeholder": "Type your response",
+      "submit": "Send response",
+      "sending": "Sending..."
+    },
+    "status": {
+      "active": "Open for joining",
+      "paused": "Temporarily paused",
+      "closed": "Closed"
+    },
+    "line": {
+      "waiting": "Currently waiting",
+      "people": "{count, plural, =0 {No one} =1 {1 person} other {# people}}",
+      "estimated": "Service time",
+      "minutes": "About {count} min each",
+      "notAvailable": "Not provided"
+    },
+    "form": {
+      "title": "A few details before you join",
+      "description": "These questions were added by the team managing this line.",
+      "readyTitle": "Ready to join",
+      "readyDescription": "This line does not require any information from you.",
+      "selectOption": "Select an option",
+      "joinButton": "Join this line",
+      "unavailableButton": "Joining is unavailable"
+    },
+    "success": {
+      "eyebrow": "You are in the line",
+      "title": "Joined {name}",
+      "position": "Your number",
+      "ahead": "People ahead",
+      "saved": "Your private ticket has been saved on this device. Keep this browser available for queue updates.",
+      "servedInfo": "This ticket has already been served. No further queue updates are needed.",
+      "cancelledInfo": "This ticket was cancelled and is no longer active.",
+      "status": {
+        "waiting": "Waiting",
+        "called": "It is your turn",
+        "served": "Completed",
+        "cancelled": "Cancelled"
+      }
+    },
+    "share": "Share line",
+    "copyLink": "Copy link",
+    "copied": "Link copied",
+    "shareText": "Join {name} on LineME.",
+    "errors": {
+      "invalidCode": "Enter the complete 10-character line code.",
+      "notFound": "We could not find a line with that code. Check the code and try again.",
+      "lookup": "The line could not be loaded right now. Please try again.",
+      "line_not_active": "This line is not accepting new visitors right now.",
+      "line_at_capacity": "This line has reached its capacity for today.",
+      "required_answer_missing": "Complete all required questions before joining.",
+      "join_failed": "You could not be added to the line. Please try again.",
+      "leave_failed": "You could not leave the line right now. Please try again.",
+      "already_completed": "This ticket has already been completed and cannot be cancelled.",
+      "response_required": "Enter a response before sending.",
+      "response_failed": "Your response could not be sent. Please try again.",
+      "ticket_lookup": "Your saved ticket could not be refreshed right now."
+    }
+  }
+}

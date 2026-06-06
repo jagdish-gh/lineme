@@ -7,6 +7,8 @@
     "close": "मेन्यू बंद करें",
     "language": "भाषा",
     "theme": "थीम",
+    "themeChange": "वर्तमान थीम: {current}। {next} में बदलें",
+    "login": "लॉग इन",
     "signedInUser": "साइन इन किया हुआ उपयोगकर्ता",
     "account": {
       "profile": "प्रोफाइल देखें",

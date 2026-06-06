@@ -1,0 +1,82 @@
+{
+  "manageLine": {
+    "eyebrow": "Live queue control",
+    "back": "Back to your queues",
+    "lineStatus": {
+      "active": "Active",
+      "paused": "Paused",
+      "closed": "Closed"
+    },
+    "summary": {
+      "active": "Active members",
+      "called": "Currently called",
+      "none": "No one called"
+    },
+    "callNext": "Call next person",
+    "refresh": "Refresh queue",
+    "intake": {
+      "title": "New member intake",
+      "active": "The queue is accepting new members.",
+      "paused": "New members are paused until you resume the queue.",
+      "pausedUntil": "Lunch pause is active. New members can join again after {time}.",
+      "closed": "This queue has expired and no longer accepts new members.",
+      "pause": "Pause new members",
+      "lunch": "Lunch break · 30 min",
+      "resume": "Resume intake",
+      "expire": "Expire queue"
+    },
+    "expireDialog": {
+      "title": "Expire this queue?",
+      "description": "New members will no longer be able to join. Existing members and history will remain visible, but this action cannot be reversed.",
+      "cancel": "Keep queue open",
+      "confirm": "Expire queue",
+      "expiring": "Expiring..."
+    },
+    "memberNumber": "Member #{number}",
+    "position": "Position #{number}",
+    "joined": "Joined {time}",
+    "answer": "Answer",
+    "noAnswers": "No join information was provided.",
+    "status": {
+      "waiting": "Waiting",
+      "called": "Called",
+      "served": "Served",
+      "cancelled": "Cancelled"
+    },
+    "members": {
+      "title": "Queue members",
+      "description": "Review details and control who is served next.",
+      "empty": "There are no members in this view."
+    },
+    "filters": {
+      "active": "Active",
+      "all": "All"
+    },
+    "actions": {
+      "call": "Call",
+      "served": "Mark served",
+      "requestInfo": "Ask for info"
+    },
+    "requests": {
+      "pending": "Waiting for the member's response"
+    },
+    "requestDialog": {
+      "title": "Ask for more information",
+      "description": "The question will appear on this member's private ticket.",
+      "placeholder": "Example: Please provide your appointment reference number.",
+      "cancel": "Cancel",
+      "submit": "Send request",
+      "submitting": "Sending..."
+    },
+    "errors": {
+      "noWaiting": "There is no waiting member to call.",
+      "memberUnavailable": "This member is no longer available for that action.",
+      "actionFailed": "The queue action could not be completed. Please try again.",
+      "requestFailed": "The information request could not be sent."
+      ,
+      "pauseNotAllowed": "Pausing is disabled for this queue.",
+      "lineExpired": "This queue has already expired.",
+      "statusFailed": "The queue status could not be changed."
+    }
+  }
+}

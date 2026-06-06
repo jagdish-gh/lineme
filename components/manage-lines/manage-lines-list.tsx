@@ -4,11 +4,14 @@ import {
   Clock3,
   MapPin,
   PauseCircle,
+  Settings2,
   UsersRound
 } from "lucide-react";
 import { getFormatter, getTranslations } from "next-intl/server";
+import Link from "next/link";
 
 import { CopyLineCodeButton } from "@/components/manage-lines/copy-line-code-button";
+import { ShareLineButton } from "@/components/manage-lines/share-line-button";
 import { Surface } from "@/components/ui/surface";
 
 export type ManagedLine = {
@@ -22,12 +25,14 @@ export type ManagedLine = {
   line_type: "clinic" | "event" | "other" | "restaurant" | "service";
   location: string | null;
   name: string;
+  paused_until: string | null;
   public_code: string;
   status: "active" | "closed" | "paused";
 };
 
 type ManageLinesListProps = {
   lines: ManagedLine[];
+  locale: string;
 };
 
 const statusStyles = {
@@ -39,13 +44,19 @@ const statusStyles = {
     "bg-slate-500/10 text-slate-600 dark:bg-slate-300/10 dark:text-slate-300"
 };
 
-export async function ManageLinesList({ lines }: ManageLinesListProps) {
+export async function ManageLinesList({ lines, locale }: ManageLinesListProps) {
   const t = await getTranslations("manageLines");
   const format = await getFormatter();
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       {lines.map((line) => {
+        const effectiveStatus =
+          line.status === "paused" &&
+          line.paused_until &&
+          new Date(line.paused_until).getTime() <= Date.now()
+            ? "active"
+            : line.status;
         const typeLabel =
           line.line_type === "other" && line.custom_line_type
             ? line.custom_line_type
@@ -60,9 +71,9 @@ export async function ManageLinesList({ lines }: ManageLinesListProps) {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <span
-                    className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusStyles[line.status]}`}
+                    className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusStyles[effectiveStatus]}`}
                   >
-                    {t(`status.${line.status}`)}
+                    {t(`status.${effectiveStatus}`)}
                   </span>
                   <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                     {typeLabel}
@@ -93,11 +104,14 @@ export async function ManageLinesList({ lines }: ManageLinesListProps) {
                     {line.public_code}
                   </p>
                 </div>
-                <CopyLineCodeButton
-                  code={line.public_code}
-                  copiedLabel={t("copied")}
-                  copyLabel={t("copyCode")}
-                />
+                <div className="flex flex-wrap gap-2">
+                  <ShareLineButton code={line.public_code} name={line.name} />
+                  <CopyLineCodeButton
+                    code={line.public_code}
+                    copiedLabel={t("copied")}
+                    copyLabel={t("copyCode")}
+                  />
+                </div>
               </div>
             </div>
 
@@ -154,6 +168,13 @@ export async function ManageLinesList({ lines }: ManageLinesListProps) {
                 })}
               </span>
             </div>
+            <Link
+              href={`/${locale}/manage/${line.id}`}
+              className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-teal-600 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:bg-teal-300 dark:text-slate-950 dark:hover:bg-teal-200"
+            >
+              <Settings2 aria-hidden="true" className="h-4 w-4" />
+              {t("manageQueue")}
+            </Link>
           </Surface>
         );
       })}

@@ -1,5 +1,5 @@
 import { type LucideIcon } from "lucide-react";
-import { type ButtonHTMLAttributes } from "react";
+import { forwardRef, type ButtonHTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -24,26 +24,32 @@ const sizes = {
   icon: "h-10 w-10 rounded-xl p-0"
 };
 
-export function ActionButton({
-  children,
-  className,
-  icon: Icon,
-  size = "medium",
-  variant = "primary",
-  ...props
-}: ActionButtonProps) {
-  return (
-    <button
-      className={cn(
-        "inline-flex items-center justify-center gap-2 font-semibold transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:opacity-55",
-        variants[variant],
-        sizes[size],
-        className
-      )}
-      {...props}
-    >
-      {Icon ? <Icon aria-hidden="true" className="h-4 w-4" /> : null}
-      {children}
-    </button>
-  );
-}
+export const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
+  function ActionButton(
+    {
+      children,
+      className,
+      icon: Icon,
+      size = "medium",
+      variant = "primary",
+      ...props
+    },
+    ref
+  ) {
+    return (
+      <button
+        ref={ref}
+        className={cn(
+          "inline-flex items-center justify-center gap-2 font-semibold transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:opacity-55",
+          variants[variant],
+          sizes[size],
+          className
+        )}
+        {...props}
+      >
+        {Icon ? <Icon aria-hidden="true" className="h-4 w-4" /> : null}
+        {children}
+      </button>
+    );
+  }
+);

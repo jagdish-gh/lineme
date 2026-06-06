@@ -6,6 +6,9 @@
   "hero": {
     "eyebrow": "Real-time queue management",
     "title": "Welcome to LineME",
+    "titleBefore": "Welcome to",
+    "titleBrand": "LineME",
+    "titleAfter": "",
     "subtitle": "Businesses create a digital waiting line and share a code. Visitors join from their phone, see their position, and arrive when their turn is close.",
     "primaryCta": "Join the Line",
     "primaryDescription": "Enter a code and see your live position.",

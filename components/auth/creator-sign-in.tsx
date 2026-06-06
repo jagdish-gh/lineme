@@ -1,8 +1,7 @@
 "use client";
 
 import { LoaderCircle, Mail, ShieldCheck } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { ActionButton } from "@/components/ui/action-button";
@@ -18,25 +17,12 @@ type CreatorSignInProps = {
 
 export function CreatorSignIn({ errorCode, nextPath }: CreatorSignInProps) {
   const t = useTranslations("auth");
-  const router = useRouter();
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "sent">("idle");
   const [error, setError] = useState(
     errorCode ? t(`errors.${errorCode === "callback" ? "callback" : "configuration"}`) : ""
   );
-
-  useEffect(() => {
-    if (!supabase) {
-      return;
-    }
-
-    void supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        router.replace(nextPath);
-      }
-    });
-  }, [nextPath, router, supabase]);
 
   async function signInWithGoogle() {
     if (!supabase) {
@@ -93,7 +79,7 @@ export function CreatorSignIn({ errorCode, nextPath }: CreatorSignInProps) {
   }
 
   return (
-    <Surface className="mx-auto max-w-lg p-5 shadow-xl shadow-slate-950/10 sm:p-7 dark:shadow-black/20">
+    <Surface className="p-5 shadow-xl shadow-slate-950/10 sm:p-7 dark:shadow-black/20">
       <div className="flex items-start gap-3">
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-teal-500/10 text-teal-700 dark:bg-teal-300/10 dark:text-teal-200">
           <ShieldCheck aria-hidden="true" className="h-5 w-5" />

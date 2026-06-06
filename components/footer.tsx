@@ -16,7 +16,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   const links = {
-    join: `/${locale}#join`,
+    join: `/${locale}/join`,
     create: `/${locale}/create`,
     manage: `/${locale}/manage`,
     privacy: `/${locale}/privacy`
@@ -31,7 +31,7 @@ export function Footer() {
             href={`/${locale}`}
             className="inline-flex rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500"
           >
-            <Logo />
+            <Logo animated />
           </Link>
           <p className="mt-4 text-sm leading-6 text-slate-600 dark:text-slate-300">
             {t("description")}

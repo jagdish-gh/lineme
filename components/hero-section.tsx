@@ -38,8 +38,17 @@ export function HeroSection() {
             {t("hero.eyebrow")}
           </div>
 
-          <h1 className="mt-7 max-w-4xl text-5xl font-semibold tracking-normal text-slate-950 [text-wrap:balance] dark:text-white sm:text-6xl lg:text-7xl">
-            {t("hero.title")}
+          <h1
+            aria-label={t("hero.title")}
+            className="mt-7 max-w-4xl text-5xl font-semibold tracking-normal text-slate-950 [text-wrap:balance] dark:text-white sm:text-6xl lg:text-7xl"
+          >
+            <span aria-hidden="true">
+              {t("hero.titleBefore") ? `${t("hero.titleBefore")} ` : null}
+              <span className="brand-gradient-wave">
+                {t("hero.titleBrand")}
+              </span>
+              {t("hero.titleAfter") ? ` ${t("hero.titleAfter")}` : null}
+            </span>
           </h1>
 
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 [text-wrap:balance] dark:text-slate-300 sm:text-xl">

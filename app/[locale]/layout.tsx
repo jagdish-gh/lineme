@@ -88,7 +88,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className="font-sans antialiased">
+      <body className="flex min-h-dvh flex-col font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <a

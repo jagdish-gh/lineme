@@ -85,7 +85,7 @@ export default async function ManageLinesPage({
   const { data, error } = await supabase
     .from("lines")
     .select(
-      "id, name, location, line_type, custom_line_type, estimated_service_minutes, daily_capacity, auto_notify, allow_pause, status, public_code, created_at"
+      "id, name, location, line_type, custom_line_type, estimated_service_minutes, daily_capacity, auto_notify, allow_pause, status, paused_until, public_code, created_at"
     )
     .order("created_at", { ascending: false });
 
@@ -105,7 +105,7 @@ export default async function ManageLinesPage({
           title={t("error.title")}
         />
       ) : lines.length ? (
-        <ManageLinesList lines={lines} />
+        <ManageLinesList lines={lines} locale={locale} />
       ) : (
         <Surface className="p-7 text-center sm:p-10">
           <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-teal-500/10 text-teal-700 dark:bg-teal-300/10 dark:text-teal-200">

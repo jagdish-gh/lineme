@@ -35,6 +35,37 @@ body {
   background: rgb(45 212 191 / 0.35);
 }
 
+.brand-gradient-wave {
+  display: inline-block;
+  background-image: linear-gradient(
+    100deg,
+    #0d9488 0%,
+    #22d3ee 24%,
+    #8b5cf6 48%,
+    #ec4899 66%,
+    #22d3ee 82%,
+    #0d9488 100%
+  );
+  background-size: 240% 100%;
+  background-position: 0% 50%;
+  background-clip: text;
+  color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: brand-gradient-wave 60s ease-in-out infinite;
+}
+
+@keyframes brand-gradient-wave {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

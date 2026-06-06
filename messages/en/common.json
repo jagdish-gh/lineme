@@ -7,6 +7,8 @@
     "close": "Close menu",
     "language": "Language",
     "theme": "Theme",
+    "themeChange": "Current theme: {current}. Change to {next}",
+    "login": "Log in",
     "signedInUser": "Signed-in user",
     "account": {
       "profile": "View profile",
