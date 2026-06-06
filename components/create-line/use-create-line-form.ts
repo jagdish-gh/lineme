@@ -1,38 +1,79 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import { loadCreateLineDraft } from "@/components/create-line/create-line-draft";
 import { type CreateLineFormState } from "@/components/create-line/create-line.types";
+import { type FormQuestion } from "@/components/ui/question-builder.types";
 
-export function useCreateLineForm(defaults: Pick<CreateLineFormState, "lineName" | "location">) {
-  const [created, setCreated] = useState(false);
+type CreateLineDefaults = Pick<CreateLineFormState, "lineName" | "location" | "joinQuestions">;
+
+export function useCreateLineForm(defaults: CreateLineDefaults) {
+  const nextQuestionId = useRef(defaults.joinQuestions.length + 1);
   const [form, setForm] = useState<CreateLineFormState>({
     ...defaults,
     queueType: "clinic",
-    estimatedMinutes: 8,
-    capacity: 40,
+    customQueueType: "",
+    estimatedMinutes: "",
+    capacity: "",
     autoNotify: true,
-    allowPause: true
+    allowPause: true,
+    joinQuestions: defaults.joinQuestions
   });
 
-  const lineCode = useMemo(() => {
-    const cleaned = form.lineName.replace(/[^a-zA-Z0-9]/g, "").slice(0, 3).toUpperCase();
-    return `${cleaned || "LIN"}-${Math.max(10, form.capacity + form.estimatedMinutes)}`;
-  }, [form.capacity, form.estimatedMinutes, form.lineName]);
+  useEffect(() => {
+    const draft = loadCreateLineDraft();
+
+    if (draft) {
+      setForm(draft);
+      nextQuestionId.current = draft.joinQuestions.length + 1;
+    }
+  }, []);
 
   function updateForm<Key extends keyof CreateLineFormState>(
     key: Key,
     value: CreateLineFormState[Key]
   ) {
-    setCreated(false);
     setForm((current) => ({ ...current, [key]: value }));
   }
 
+  function addQuestion(label: string) {
+    const question: FormQuestion = {
+      id: `question-${nextQuestionId.current}`,
+      label,
+      options: [],
+      required: false,
+      type: "text"
+    };
+
+    nextQuestionId.current += 1;
+    setForm((current) => ({
+      ...current,
+      joinQuestions: [...current.joinQuestions, question]
+    }));
+  }
+
+  function updateQuestion(id: string, changes: Partial<Omit<FormQuestion, "id">>) {
+    setForm((current) => ({
+      ...current,
+      joinQuestions: current.joinQuestions.map((question) =>
+        question.id === id ? { ...question, ...changes } : question
+      )
+    }));
+  }
+
+  function removeQuestion(id: string) {
+    setForm((current) => ({
+      ...current,
+      joinQuestions: current.joinQuestions.filter((question) => question.id !== id)
+    }));
+  }
+
   return {
-    created,
+    addQuestion,
     form,
-    lineCode,
-    setCreated,
-    updateForm
+    removeQuestion,
+    updateForm,
+    updateQuestion
   };
 }

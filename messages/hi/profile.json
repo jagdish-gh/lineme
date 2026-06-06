@@ -1,0 +1,27 @@
+{
+  "profile": {
+    "metadata": {
+      "title": "आपकी प्रोफाइल - LineME",
+      "description": "अपने LineME क्रिएटर अकाउंट की जानकारी देखें।"
+    },
+    "eyebrow": "क्रिएटर अकाउंट",
+    "title": "आपकी प्रोफाइल",
+    "description": "अपनी LineME कतारों से जुड़े अकाउंट की जानकारी देखें।",
+    "authenticated": "सत्यापित अकाउंट",
+    "email": "ईमेल पता",
+    "provider": "साइन इन का तरीका",
+    "memberSince": "सदस्य बने",
+    "lastSignIn": "पिछला साइन इन",
+    "unknown": "अज्ञात",
+    "notAvailable": "उपलब्ध नहीं",
+    "queues": "{count, plural, =0 {कोई कतार नहीं बनाई} =1 {1 कतार बनाई} other {# कतारें बनाई}}",
+    "queuesDescription": "इस अकाउंट की कतारें",
+    "manageQueues": "कतारें प्रबंधित करें",
+    "logout": "लॉग आउट",
+    "signingOut": "लॉग आउट हो रहा है...",
+    "providers": {
+      "google": "Google",
+      "email": "ईमेल"
+    }
+  }
+}

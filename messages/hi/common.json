@@ -7,6 +7,13 @@
     "close": "मेन्यू बंद करें",
     "language": "भाषा",
     "theme": "थीम",
+    "signedInUser": "साइन इन किया हुआ उपयोगकर्ता",
+    "account": {
+      "profile": "प्रोफाइल देखें",
+      "manage": "कतारें प्रबंधित करें",
+      "logout": "लॉग आउट",
+      "signingOut": "लॉग आउट हो रहा है..."
+    },
     "logo": "LineME होम"
   },
   "theme": {

@@ -1,0 +1,27 @@
+{
+  "profile": {
+    "metadata": {
+      "title": "Your profile - LineME",
+      "description": "View your LineME creator account information."
+    },
+    "eyebrow": "Creator account",
+    "title": "Your profile",
+    "description": "Review the account information connected to your LineME queues.",
+    "authenticated": "Authenticated account",
+    "email": "Email address",
+    "provider": "Sign-in method",
+    "memberSince": "Member since",
+    "lastSignIn": "Last sign-in",
+    "unknown": "Unknown",
+    "notAvailable": "Not available",
+    "queues": "{count, plural, =0 {No queues created} =1 {1 queue created} other {# queues created}}",
+    "queuesDescription": "Queues owned by this account",
+    "manageQueues": "Manage queues",
+    "logout": "Log out",
+    "signingOut": "Logging out...",
+    "providers": {
+      "google": "Google",
+      "email": "Email"
+    }
+  }
+}

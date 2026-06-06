@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { UserAvatar } from "@/components/auth/user-avatar";
+import { useCreatorSession } from "@/components/auth/use-creator-session";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "./logo/Logo";
@@ -13,11 +15,12 @@ export function Navbar() {
   const t = useTranslations("nav");
   const locale = useLocale();
   const [open, setOpen] = useState(false);
+  const { user } = useCreatorSession();
 
   const navLinks = [
     { href: `/${locale}#join`, label: t("join") },
     { href: `/${locale}/create`, label: t("create") },
-    { href: `/${locale}#manage`, label: t("manage") }
+    { href: `/${locale}/manage`, label: t("manage") }
   ];
 
   return (
@@ -34,34 +37,37 @@ export function Navbar() {
           <Logo />
         </Link>
 
-        <div className="hidden items-center gap-8 md:flex">
-          <div className="flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-full transition hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500 dark:hover:text-white"
-              >
-                {link.label}
-              </Link>
-            ))}
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="hidden items-center gap-8 md:flex">
+            <div className="flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="rounded-full transition hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500 dark:hover:text-white"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+            <div className="flex items-center gap-3">
+              <LanguageSwitcher />
+              <ThemeToggle />
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <LanguageSwitcher />
-            <ThemeToggle />
-          </div>
-        </div>
 
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          aria-label={open ? t("close") : t("menu")}
-          onClick={() => setOpen((value) => !value)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-white/70 text-slate-800 shadow-sm backdrop-blur-xl transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15 md:hidden"
-        >
-          {open ? <X aria-hidden="true" className="h-5 w-5" /> : <Menu aria-hidden="true" className="h-5 w-5" />}
-        </button>
+          <UserAvatar label={t("signedInUser")} user={user} />
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? t("close") : t("menu")}
+            onClick={() => setOpen((value) => !value)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-white/70 text-slate-800 shadow-sm backdrop-blur-xl transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15 md:hidden"
+          >
+            {open ? <X aria-hidden="true" className="h-5 w-5" /> : <Menu aria-hidden="true" className="h-5 w-5" />}
+          </button>
+        </div>
       </nav>
 
       {open ? (

@@ -6,20 +6,46 @@
   "hero": {
     "eyebrow": "Real-time queue management",
     "title": "Welcome to LineME",
-    "subtitle": "Skip physical waiting. Join and manage queues digitally in real time.",
+    "subtitle": "Businesses create a digital waiting line and share a code. Visitors join from their phone, see their position, and arrive when their turn is close.",
     "primaryCta": "Join the Line",
+    "primaryDescription": "Enter a code and see your live position.",
     "secondaryCta": "Create a Line",
-    "status": "Live now",
-    "waitTime": "Avg. wait",
-    "peopleAhead": "People ahead",
-    "managedToday": "Lines managed today"
+    "secondaryDescription": "Set up a digital queue for your service.",
+    "highlights": {
+      "browser": "No app required",
+      "position": "Live queue position",
+      "updates": "Optional turn updates"
+    }
   },
-  "queueCard": {
-    "title": "Downtown Clinic",
-    "counter": "Counter 4",
-    "next": "Next up",
-    "joined": "You joined 2 min ago",
-    "notify": "Notification enabled"
+  "faq": {
+    "title": "What does LineME do?",
+    "subtitle": "The simple version, before you get started.",
+    "items": {
+      "what": {
+        "question": "What is LineME?",
+        "answer": "LineME replaces a physical waiting line with a digital one. People can wait wherever they are instead of standing in a crowded queue."
+      },
+      "how": {
+        "question": "How does a queue work?",
+        "answer": "A business creates a line and shares its code. A visitor enters that code, joins the line, and can check their live position from their phone."
+      },
+      "account": {
+        "question": "Do visitors need an account?",
+        "answer": "No. Visitors can join with a queue code. Contact details are only needed when they choose to receive updates."
+      },
+      "install": {
+        "question": "Do I need to install an app?",
+        "answer": "No. LineME works in a web browser, so visitors can open a link or enter a queue code from their phone without installing anything."
+      },
+      "turn": {
+        "question": "How will I know when my turn is close?",
+        "answer": "You can check your live position from your phone. When notifications are enabled, the line can also send updates as your turn gets closer."
+      },
+      "who": {
+        "question": "Who can use LineME?",
+        "answer": "Clinics, salons, restaurants, service counters, events, and any team that serves people in an ordered line can use it."
+      }
+    }
   },
   "features": {
     "join": {

@@ -1,0 +1,50 @@
+{
+  "manageLines": {
+    "metadata": {
+      "title": "Manage queues - LineME",
+      "description": "View the digital queues you created with LineME."
+    },
+    "eyebrow": "Creator dashboard",
+    "title": "Your queues",
+    "description": "See every queue you created, check its status, and quickly share its public code.",
+    "createNew": "Create a new queue",
+    "createFirst": "Create your first queue",
+    "lineCount": "{count, plural, =0 {No queues yet} =1 {1 queue} other {# queues}}",
+    "lineCode": "Public queue code",
+    "copyCode": "Copy code",
+    "copied": "Copied",
+    "serviceTime": "Service time",
+    "dailyCapacity": "Daily capacity",
+    "minutes": "{count} min",
+    "notSet": "Not set",
+    "notificationsOn": "Notifications on",
+    "notificationsOff": "Notifications off",
+    "pauseAllowed": "Pausing allowed",
+    "pauseDisabled": "Pausing disabled",
+    "created": "Created {date}",
+    "status": {
+      "active": "Active",
+      "paused": "Paused",
+      "closed": "Closed"
+    },
+    "types": {
+      "clinic": "Clinic",
+      "restaurant": "Restaurant",
+      "service": "Service",
+      "event": "Event",
+      "other": "Other"
+    },
+    "empty": {
+      "title": "No queues here yet",
+      "description": "Create your first queue and it will appear here automatically."
+    },
+    "error": {
+      "title": "We could not load your queues",
+      "description": "Please refresh the page in a moment. Your saved queues have not been changed."
+    },
+    "configuration": {
+      "title": "Queue management is not configured",
+      "description": "Add the Supabase environment variables to load creator queues."
+    }
+  }
+}

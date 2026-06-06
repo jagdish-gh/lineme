@@ -5,44 +5,141 @@
       "description": "Create a digital queue with live capacity, wait time, and notification settings."
     },
     "back": "Back home",
-    "eyebrow": "Line setup",
-    "title": "Create a line that is ready to manage.",
-    "subtitle": "Set the basics, choose how people join, and publish a live queue code your visitors can use right away.",
-    "submit": "Create line",
-    "created": "Line draft is ready",
+    "eyebrow": "Create a digital line",
+    "title": "Set up the line your visitors will join.",
+    "submit": "Save and continue securely",
+    "checkingSession": "Checking secure session...",
+    "create": "Create line",
+    "creating": "Creating your line...",
+    "submitHint": "Your draft will be saved on this device. Visitors will never need an account to join.",
+    "success": {
+      "title": "Your line is created",
+      "description": "The line and its visitor questions were saved securely. Keep this code handy.",
+      "codeLabel": "Line code",
+      "copy": "Copy code",
+      "copied": "Copied"
+    },
+    "errors": {
+      "authentication_required": "Your session expired. Please sign in again.",
+      "configuration": "Line creation is not configured yet.",
+      "create_failed": "We could not create the line. Please try again.",
+      "database_not_ready": "Line creation is being configured. The database migration still needs to be applied.",
+      "invalid_capacity": "Daily capacity must be between 5 and 250.",
+      "invalid_custom_type": "Enter a line type between 2 and 80 characters.",
+      "invalid_estimate": "Average service time must be between 2 and 60 minutes.",
+      "invalid_line_name": "Enter a line name between 2 and 100 characters.",
+      "invalid_location": "Location must be 160 characters or fewer.",
+      "invalid_questions": "Check the visitor questions. Multiple-choice questions need at least two options.",
+      "invalid_request": "Check the line details and try again."
+    },
     "minutes": "min",
     "people": "people",
     "defaults": {
-      "lineName": "Downtown Clinic",
-      "location": "Counter 4"
+      "lineName": "",
+      "location": ""
+    },
+    "sections": {
+      "details": {
+        "title": "Line details",
+        "description": "Help visitors recognize the correct line and set realistic service expectations."
+      }
     },
     "fields": {
       "lineName": "Line name",
-      "location": "Location or counter",
+      "location": "Location or counter (optional)",
       "queueType": "Line type",
-      "estimatedMinutes": "Average service time",
-      "capacity": "Daily capacity",
+      "customQueueType": "Describe your line type",
+      "estimatedMinutes": "Average service time (optional)",
+      "capacity": "Daily capacity (optional)",
       "autoNotify": "Notify people automatically",
       "allowPause": "Allow pausing intake"
+    },
+    "placeholders": {
+      "lineName": "Example: General consultation",
+      "location": "Example: First floor, Counter 4",
+      "customQueueType": "Example: Document collection",
+      "optionalNumber": "Leave blank"
+    },
+    "advanced": {
+      "title": "Advanced settings",
+      "description": "Wait time, capacity, notifications, and intake controls"
     },
     "types": {
       "clinic": "Clinic",
       "restaurant": "Restaurant",
       "service": "Service",
-      "event": "Event"
+      "event": "Event",
+      "other": "Other"
     },
-    "preview": {
-      "label": "Live preview",
-      "live": "Ready",
-      "averageWait": "Average wait",
-      "capacity": "Capacity",
-      "type": "Type",
-      "lineCode": "Line code",
-      "copy": "Copy line code",
-      "notifyOn": "Automatic updates enabled",
-      "notifyOff": "Automatic updates disabled",
-      "pauseOn": "Managers can pause intake",
-      "pauseOff": "Intake stays open"
+    "questions": {
+      "title": "Information to collect (optional)",
+      "description": "Ask only what your team needs before serving someone. Visitors will complete these fields when they join.",
+      "summary": "{count, plural, =0 {No questions configured} =1 {1 question configured} other {# questions configured}}",
+      "add": "Add a question",
+      "addOption": "Add option",
+      "empty": "No questions added. Visitors will be able to join without entering any information.",
+      "fieldLabel": "Question shown to visitors",
+      "fieldPlaceholder": "Example: Appointment ID",
+      "newQuestion": "New question",
+      "optionLabel": "Answer options",
+      "optionPlaceholder": "Example: General medicine",
+      "remove": "Remove question",
+      "removeOption": "Remove option",
+      "required": "Answer required",
+      "typeLabel": "Answer type",
+      "defaults": {
+        "name": "Full name",
+        "phone": "Phone number"
+      },
+      "types": {
+        "text": "Short text",
+        "phone": "Phone number",
+        "email": "Email address",
+        "number": "Number",
+        "choice": "Multiple choice"
+      }
+    },
+    "faq": {
+      "title": "Setting up your line",
+      "subtitle": "Helpful answers while you configure it.",
+      "items": {
+        "lineDetails": {
+          "question": "Which line details are required?",
+          "answer": "Only the line name is required. Location is optional, but adding it helps visitors find the correct counter, floor, room, or service point."
+        },
+        "otherType": {
+          "question": "What if my line type is not listed?",
+          "answer": "Select Other and enter your own line type, such as document collection, admissions, repairs, interviews, or any service that suits your workflow."
+        },
+        "advanced": {
+          "question": "Do I need to complete Advanced settings?",
+          "answer": "No. Average service time and daily capacity are optional and can be left blank. Notification and intake controls already have sensible defaults and can be changed later."
+        },
+        "questions": {
+          "question": "What should I ask visitors?",
+          "answer": "The Information to collect section is optional. Ask only for information your team needs before service, such as a name, phone number, appointment ID, party size, department, or service type."
+        },
+        "answerTypes": {
+          "question": "Which answer type should I choose?",
+          "answer": "Use short text for names or IDs, phone or email for contact details, number for values such as party size, and multiple choice when visitors should select from fixed options."
+        },
+        "multipleChoice": {
+          "question": "When should I use multiple choice?",
+          "answer": "Use multiple choice for predictable answers such as department, service type, appointment category, or preferred counter. Add only the options your team can actually serve."
+        },
+        "required": {
+          "question": "Should every answer be required?",
+          "answer": "No. Make a question required only when your team cannot provide the service without that information. Fewer required fields make joining faster."
+        },
+        "editQuestions": {
+          "question": "Can I change these questions later?",
+          "answer": "Yes. You can review, add, remove, or update joiner questions before sharing the line, and the setup can support later edits when line management is connected."
+        },
+        "after": {
+          "question": "What happens after I continue?",
+          "answer": "If you are not signed in, your draft is saved while you authenticate. After sign-in, create the line and LineME will generate its unique line code."
+        }
+      }
     }
   }
 }

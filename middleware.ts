@@ -14,6 +14,6 @@ export const config = {
 
     "/(en|hi)/:path*",
 
-    "/((?!api|_next|_vercel|.*\\..*|favicon.ico|icon.png|apple-icon.png).*)",
+    "/((?!api|auth/callback|_next|_vercel|.*\\..*|favicon.ico|icon.png|apple-icon.png).*)",
   ],
 };

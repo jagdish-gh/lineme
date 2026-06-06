@@ -18,7 +18,7 @@ export function Footer() {
   const links = {
     join: `/${locale}#join`,
     create: `/${locale}/create`,
-    manage: `/${locale}#manage`,
+    manage: `/${locale}/manage`,
     privacy: `/${locale}/privacy`
   };
 

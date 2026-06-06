@@ -7,12 +7,18 @@ const messageLoaders = {
     ...(await import("../messages/en/common.json")).default,
     ...(await import("../messages/en/home.json")).default,
     ...(await import("../messages/en/create-line.json")).default,
+    ...(await import("../messages/en/auth.json")).default,
+    ...(await import("../messages/en/manage-lines.json")).default,
+    ...(await import("../messages/en/profile.json")).default,
     ...(await import("../messages/en/privacy.json")).default
   }),
   hi: async () => ({
     ...(await import("../messages/hi/common.json")).default,
     ...(await import("../messages/hi/home.json")).default,
     ...(await import("../messages/hi/create-line.json")).default,
+    ...(await import("../messages/hi/auth.json")).default,
+    ...(await import("../messages/hi/manage-lines.json")).default,
+    ...(await import("../messages/hi/profile.json")).default,
     ...(await import("../messages/hi/privacy.json")).default
   })
 } satisfies Record<Locale, () => Promise<Record<string, unknown>>>;

@@ -7,6 +7,13 @@
     "close": "Close menu",
     "language": "Language",
     "theme": "Theme",
+    "signedInUser": "Signed-in user",
+    "account": {
+      "profile": "View profile",
+      "manage": "Manage queues",
+      "logout": "Log out",
+      "signingOut": "Logging out..."
+    },
     "logo": "LineME home"
   },
   "theme": {

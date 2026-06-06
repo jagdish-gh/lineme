@@ -1,0 +1,50 @@
+{
+  "manageLines": {
+    "metadata": {
+      "title": "कतारें प्रबंधित करें - LineME",
+      "description": "LineME पर बनाई गई अपनी डिजिटल कतारें देखें।"
+    },
+    "eyebrow": "क्रिएटर डैशबोर्ड",
+    "title": "आपकी कतारें",
+    "description": "अपनी बनाई सभी कतारें देखें, उनकी स्थिति जांचें और सार्वजनिक कोड तुरंत साझा करें।",
+    "createNew": "नई कतार बनाएं",
+    "createFirst": "अपनी पहली कतार बनाएं",
+    "lineCount": "{count, plural, =0 {अभी कोई कतार नहीं} =1 {1 कतार} other {# कतारें}}",
+    "lineCode": "सार्वजनिक कतार कोड",
+    "copyCode": "कोड कॉपी करें",
+    "copied": "कॉपी हो गया",
+    "serviceTime": "सेवा समय",
+    "dailyCapacity": "दैनिक क्षमता",
+    "minutes": "{count} मिनट",
+    "notSet": "सेट नहीं",
+    "notificationsOn": "सूचनाएं चालू",
+    "notificationsOff": "सूचनाएं बंद",
+    "pauseAllowed": "रोकने की अनुमति",
+    "pauseDisabled": "रोकना बंद",
+    "created": "{date} को बनाई",
+    "status": {
+      "active": "सक्रिय",
+      "paused": "रुकी हुई",
+      "closed": "बंद"
+    },
+    "types": {
+      "clinic": "क्लिनिक",
+      "restaurant": "रेस्तरां",
+      "service": "सेवा",
+      "event": "कार्यक्रम",
+      "other": "अन्य"
+    },
+    "empty": {
+      "title": "अभी कोई कतार नहीं है",
+      "description": "अपनी पहली कतार बनाएं और वह यहां अपने आप दिखाई देगी।"
+    },
+    "error": {
+      "title": "आपकी कतारें लोड नहीं हो सकीं",
+      "description": "कुछ देर में पेज रीफ्रेश करें। आपकी सेव की गई कतारों में कोई बदलाव नहीं हुआ है।"
+    },
+    "configuration": {
+      "title": "कतार प्रबंधन कॉन्फिगर नहीं है",
+      "description": "क्रिएटर की कतारें लोड करने के लिए Supabase environment variables जोड़ें।"
+    }
+  }
+}

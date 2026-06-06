@@ -1,10 +1,23 @@
 "use client";
 
-import { Field } from "@/components/ui/field";
-import { FormToggle } from "@/components/ui/form-toggle";
-import { Surface } from "@/components/ui/surface";
 import { type CreateLineFormState, queueTypes } from "@/components/create-line/create-line.types";
-import { BellRing, Building2, Hash, PauseCircle, Timer, Users } from "lucide-react";
+import { Field } from "@/components/ui/field";
+import { Disclosure } from "@/components/ui/disclosure";
+import { FormSection } from "@/components/ui/form-section";
+import { FormToggle } from "@/components/ui/form-toggle";
+import { SelectField } from "@/components/ui/select-field";
+import {
+  BellRing,
+  Building2,
+  Hash,
+  ListChecks,
+  PauseCircle,
+  PencilLine,
+  Settings2,
+  SlidersHorizontal,
+  Timer,
+  Users
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 
 type CreateLineFieldsProps = {
@@ -19,81 +32,114 @@ export function CreateLineFields({ form, onChange }: CreateLineFieldsProps) {
   const t = useTranslations("createLine");
 
   return (
-    <Surface className="grid gap-5 p-5 sm:p-6">
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Field
-          icon={Building2}
-          label={t("fields.lineName")}
-          value={form.lineName}
-          onChange={(event) => onChange("lineName", event.target.value)}
-        />
-        <Field
-          icon={Hash}
-          label={t("fields.location")}
-          value={form.location}
-          onChange={(event) => onChange("location", event.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-          {t("fields.queueType")}
-        </label>
-        <div className="mt-3 grid gap-2 sm:grid-cols-4">
-          {queueTypes.map((type) => (
-            <button
-              key={type}
-              type="button"
-              onClick={() => onChange("queueType", type)}
-              className={
-                form.queueType === type
-                  ? "min-h-12 rounded-2xl bg-slate-950 px-3 text-sm font-semibold text-white shadow-lg shadow-slate-950/10 transition dark:bg-white dark:text-slate-950"
-                  : "min-h-12 rounded-2xl border border-slate-950/10 bg-white/70 px-3 text-sm font-semibold text-slate-700 transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:border-white/10 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15"
-              }
-            >
-              {t(`types.${type}`)}
-            </button>
-          ))}
+    <FormSection
+      compact
+      description={t("sections.details.description")}
+      icon={Settings2}
+      title={t("sections.details.title")}
+    >
+      <div className="grid gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            icon={Building2}
+            label={t("fields.lineName")}
+            placeholder={t("placeholders.lineName")}
+            required
+            value={form.lineName}
+            onChange={(event) => onChange("lineName", event.target.value)}
+          />
+          <Field
+            icon={Hash}
+            label={t("fields.location")}
+            placeholder={t("placeholders.location")}
+            value={form.location}
+            onChange={(event) => onChange("location", event.target.value)}
+          />
         </div>
-      </div>
 
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Field
-          icon={Timer}
-          label={t("fields.estimatedMinutes")}
-          min={2}
-          max={60}
-          type="number"
-          value={form.estimatedMinutes}
-          suffix={t("minutes")}
-          onChange={(event) => onChange("estimatedMinutes", Number(event.target.value))}
-        />
-        <Field
-          icon={Users}
-          label={t("fields.capacity")}
-          min={5}
-          max={250}
-          type="number"
-          value={form.capacity}
-          suffix={t("people")}
-          onChange={(event) => onChange("capacity", Number(event.target.value))}
-        />
-      </div>
+        <SelectField
+          icon={ListChecks}
+          label={t("fields.queueType")}
+          options={queueTypes.map((type) => ({
+            label: t(`types.${type}`),
+            value: type
+          }))}
+          value={form.queueType}
+          onChange={(event) => {
+            const queueType = event.target.value as CreateLineFormState["queueType"];
+            onChange("queueType", queueType);
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <FormToggle
-          checked={form.autoNotify}
-          icon={BellRing}
-          label={t("fields.autoNotify")}
-          onChange={(checked) => onChange("autoNotify", checked)}
+            if (queueType !== "other") {
+              onChange("customQueueType", "");
+            }
+          }}
         />
-        <FormToggle
-          checked={form.allowPause}
-          icon={PauseCircle}
-          label={t("fields.allowPause")}
-          onChange={(checked) => onChange("allowPause", checked)}
-        />
+
+        {form.queueType === "other" ? (
+          <Field
+            icon={PencilLine}
+            label={t("fields.customQueueType")}
+            placeholder={t("placeholders.customQueueType")}
+            required
+            value={form.customQueueType}
+            onChange={(event) => onChange("customQueueType", event.target.value)}
+          />
+        ) : null}
+
+        <Disclosure
+          description={t("advanced.description")}
+          icon={SlidersHorizontal}
+          title={t("advanced.title")}
+        >
+          <div className="grid gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field
+                icon={Timer}
+                label={t("fields.estimatedMinutes")}
+                min={2}
+                max={60}
+                placeholder={t("placeholders.optionalNumber")}
+                type="number"
+                value={form.estimatedMinutes}
+                suffix={t("minutes")}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  onChange("estimatedMinutes", value === "" ? "" : Number(value));
+                }}
+              />
+              <Field
+                icon={Users}
+                label={t("fields.capacity")}
+                min={5}
+                max={250}
+                placeholder={t("placeholders.optionalNumber")}
+                type="number"
+                value={form.capacity}
+                suffix={t("people")}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  onChange("capacity", value === "" ? "" : Number(value));
+                }}
+              />
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <FormToggle
+                checked={form.autoNotify}
+                icon={BellRing}
+                label={t("fields.autoNotify")}
+                onChange={(checked) => onChange("autoNotify", checked)}
+              />
+              <FormToggle
+                checked={form.allowPause}
+                icon={PauseCircle}
+                label={t("fields.allowPause")}
+                onChange={(checked) => onChange("allowPause", checked)}
+              />
+            </div>
+          </div>
+        </Disclosure>
       </div>
-    </Surface>
+    </FormSection>
   );
 }
