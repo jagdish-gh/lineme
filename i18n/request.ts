@@ -12,6 +12,7 @@ const messageLoaders = {
     ...(await import("../messages/en/manage-line.json")).default,
     ...(await import("../messages/en/profile.json")).default,
     ...(await import("../messages/en/join-line.json")).default,
+    ...(await import("../messages/en/tickets.json")).default,
     ...(await import("../messages/en/privacy.json")).default
   }),
   hi: async () => ({
@@ -23,6 +24,7 @@ const messageLoaders = {
     ...(await import("../messages/hi/manage-line.json")).default,
     ...(await import("../messages/hi/profile.json")).default,
     ...(await import("../messages/hi/join-line.json")).default,
+    ...(await import("../messages/hi/tickets.json")).default,
     ...(await import("../messages/hi/privacy.json")).default
   })
 } satisfies Record<Locale, () => Promise<Record<string, unknown>>>;

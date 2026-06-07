@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { getSafeAuthRedirectPath } from "@/lib/auth/redirect-path";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-
-function getSafeNextPath(value: string | null) {
-  return value?.startsWith("/") && !value.startsWith("//") ? value : "/en/create";
-}
 
 function getLocaleFromPath(path: string) {
   const locale = path.split("/")[1];
@@ -14,23 +11,36 @@ function getLocaleFromPath(path: string) {
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
-  const next = getSafeNextPath(url.searchParams.get("next"));
+  const cookieNext = request.headers
+    .get("cookie")
+    ?.match(/(?:^|;\s*)lineme-auth-next=([^;]+)/)?.[1];
+  const next = getSafeAuthRedirectPath(
+    (cookieNext ? decodeURIComponent(cookieNext) : null) ??
+      url.searchParams.get("next"),
+    "/en/create"
+  );
   const locale = getLocaleFromPath(next);
   const supabase = await createSupabaseServerClient();
 
   if (!code || !supabase) {
-    return NextResponse.redirect(
+    const response = NextResponse.redirect(
       new URL(`/${locale}/auth?error=configuration&next=${encodeURIComponent(next)}`, url.origin)
     );
+    response.cookies.delete("lineme-auth-next");
+    return response;
   }
 
   const { error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error) {
-    return NextResponse.redirect(
+    const response = NextResponse.redirect(
       new URL(`/${locale}/auth?error=callback&next=${encodeURIComponent(next)}`, url.origin)
     );
+    response.cookies.delete("lineme-auth-next");
+    return response;
   }
 
-  return NextResponse.redirect(new URL(next, url.origin));
+  const response = NextResponse.redirect(new URL(next, url.origin));
+  response.cookies.delete("lineme-auth-next");
+  return response;
 }

@@ -6,6 +6,7 @@ import {
   ListChecks,
   LoaderCircle,
   LogOut,
+  TicketCheck,
   UserRound
 } from "lucide-react";
 import Link from "next/link";
@@ -152,6 +153,15 @@ export function UserAvatar({ className, label, user }: UserAvatarProps) {
             >
               <UserRound aria-hidden="true" className="h-4 w-4 text-teal-600 dark:text-teal-300" />
               {t("profile")}
+            </Link>
+            <Link
+              role="menuitem"
+              href={`/${locale}/tickets`}
+              onClick={() => setOpen(false)}
+              className="flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-950/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-500 dark:text-slate-200 dark:hover:bg-white/10"
+            >
+              <TicketCheck aria-hidden="true" className="h-4 w-4 text-teal-600 dark:text-teal-300" />
+              {t("tickets")}
             </Link>
             <Link
               role="menuitem"

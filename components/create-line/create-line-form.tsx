@@ -131,8 +131,14 @@ export function CreateLineForm() {
                     code={createdLine.publicCode}
                     copiedLabel={t("success.copied")}
                     copyLabel={t("success.copy")}
+                    customerDescription={t("success.customerDescription")}
+                    customerLinkLabel={t("success.customerLink")}
                     description={t("success.description")}
+                    lineId={createdLine.id}
                     lineCodeLabel={t("success.codeLabel")}
+                    locale={locale}
+                    manageDescription={t("success.manageDescription")}
+                    manageLinkLabel={t("success.manageLink")}
                     title={t("success.title")}
                   />
                 ) : (

@@ -12,6 +12,7 @@
     "signedInUser": "Signed-in user",
     "account": {
       "profile": "View profile",
+      "tickets": "My tickets",
       "manage": "Manage queues",
       "logout": "Log out",
       "signingOut": "Logging out..."

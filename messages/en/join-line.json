@@ -5,18 +5,21 @@
       "description": "Find a LineME queue by code, shared link, or QR code and join from your phone."
     },
     "eyebrow": "Join without an account",
+    "back": "Back to home",
     "title": "Find and join your line",
     "description": "Enter the 10-character line code, open a shared LineME link, or scan the QR code provided by the team.",
+    "detailBack": "Back to find a line",
+    "detailEyebrow": "Review your line",
+    "detailTitle": "Join this line",
+    "detailDescription": "Review the queue details, complete any requested information, and join when you are ready.",
+    "detailLoading": "Loading line",
+    "detailErrorTitle": "This line could not be opened",
     "search": {
       "title": "Enter a line code",
       "description": "Use the code displayed by the business or sent to you.",
       "label": "Line code",
       "placeholder": "XXXXXXXXXX",
       "button": "Find line"
-    },
-    "sharedLink": {
-      "title": "Open a shared link",
-      "description": "Shared links open the correct line automatically. No code entry is needed."
     },
     "qr": {
       "title": "Scan a QR code",
@@ -32,16 +35,49 @@
       "errorTitle": "Camera could not be opened",
       "errorDescription": "Allow camera access and try again, or enter the line code."
     },
-    "empty": {
-      "title": "Your line will appear here",
-      "description": "Search with a code or scan a QR code to review the line before joining."
-    },
     "saved": {
       "title": "Lines you already joined",
-      "description": "These private tickets are saved in this browser.",
-      "open": "View ticket",
-      "back": "Back to joined lines",
+      "history": "View all ticket history",
+      "loading": "Loading your latest ticket...",
+      "none": "No joined tickets yet.",
       "refresh": "Refresh position"
+    },
+    "joinAuth": {
+      "title": "Save this ticket across devices?",
+      "description": "Sign in before joining to keep this ticket in your account and open it from another phone or computer. You can also continue on this device only.",
+      "login": "Sign in and join",
+      "anonymous": "Continue on this device",
+      "close": "Close sign-in choice"
+    },
+    "faq": {
+      "title": "Joining a line",
+      "subtitle": "Quick answers before you join",
+      "items": {
+        "howToJoin": {
+          "question": "How do I join a line?",
+          "answer": "Enter the 10-character line code or scan its QR code. Review the line details, answer any required questions, then select Join this line."
+        },
+        "findCode": {
+          "question": "Where can I find the line code?",
+          "answer": "The business or team managing the line will display or share the code. You can also open their LineME link or scan their QR code."
+        },
+        "account": {
+          "question": "Do I need an account?",
+          "answer": "No. You can join on this device without an account. Sign in if you want your ticket and history available across devices."
+        },
+        "ticket": {
+          "question": "Where is my ticket saved?",
+          "answer": "Anonymous tickets stay in this browser. Tickets joined while signed in are also connected to your LineME account."
+        },
+        "rejoin": {
+          "question": "Can I join the same line again?",
+          "answer": "Yes. After your previous ticket is served or cancelled, you can join the line again while it is open."
+        },
+        "privacy": {
+          "question": "Who can see my answers?",
+          "answer": "Only the team managing the line can view the information requested by that line."
+        }
+      }
     },
     "leave": {
       "title": "Leave this line?",
@@ -62,6 +98,17 @@
       "closed": "Closed"
     },
     "line": {
+      "nameLabel": "Name",
+      "typeLabel": "Type",
+      "copyCode": "Copy code",
+      "codeCopied": "Copied",
+      "types": {
+        "clinic": "Clinic",
+        "restaurant": "Restaurant",
+        "service": "Service",
+        "event": "Event",
+        "other": "Other"
+      },
       "waiting": "Currently waiting",
       "people": "{count, plural, =0 {No one} =1 {1 person} other {# people}}",
       "estimated": "Service time",
@@ -82,9 +129,10 @@
       "title": "Joined {name}",
       "position": "Your number",
       "ahead": "People ahead",
-      "saved": "Your private ticket has been saved on this device. Keep this browser available for queue updates.",
+      "saved": "Your ticket is saved. Signed-in tickets are also available across your devices.",
       "servedInfo": "This ticket has already been served. No further queue updates are needed.",
       "cancelledInfo": "This ticket was cancelled and is no longer active.",
+      "joinAgain": "Join this line again",
       "status": {
         "waiting": "Waiting",
         "called": "It is your turn",

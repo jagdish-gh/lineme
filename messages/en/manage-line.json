@@ -2,6 +2,19 @@
   "manageLine": {
     "eyebrow": "Live queue control",
     "back": "Back to your queues",
+    "lineName": "Line name",
+    "lineType": "Line type",
+    "lineCode": "Line code",
+    "location": "Location",
+    "copyCode": "Copy code",
+    "codeCopied": "Copied",
+    "types": {
+      "clinic": "Clinic",
+      "restaurant": "Restaurant",
+      "service": "Service",
+      "event": "Event",
+      "other": "Other"
+    },
     "lineStatus": {
       "active": "Active",
       "paused": "Paused",

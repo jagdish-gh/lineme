@@ -76,10 +76,13 @@ export async function ManageLinesList({ lines, locale }: ManageLinesListProps) {
                     {t(`status.${effectiveStatus}`)}
                   </span>
                   <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                    {typeLabel}
+                    {t("lineType")}: {typeLabel}
                   </span>
                 </div>
-                <h2 className="mt-3 truncate text-xl font-semibold text-slate-950 dark:text-white">
+                <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+                  {t("lineName")}
+                </p>
+                <h2 className="mt-0.5 truncate text-xl font-semibold text-slate-950 dark:text-white">
                   {line.name}
                 </h2>
                 {line.location ? (

@@ -4,6 +4,7 @@ import {
   type PublicLine,
   type SavedJoinedLine
 } from "@/lib/lines/public-line";
+import { mapJoinedTicketRecord } from "@/lib/lines/joined-tickets";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type TicketStatus = "called" | "cancelled" | "served" | "waiting";
@@ -76,25 +77,7 @@ export async function POST(request: Request) {
       ticket_token: string;
     };
   };
-  const savedLine: SavedJoinedLine = {
-    line: restored.line,
-    ticket: {
-      entryId: restored.ticket.entry_id,
-      joinedAt: restored.ticket.joined_at,
-      peopleAhead: restored.ticket.people_ahead,
-      positionNumber: restored.ticket.position_number,
-      requests: (restored.ticket.requests ?? []).map((request) => ({
-        answeredAt: request.answered_at,
-        createdAt: request.created_at,
-        id: request.id,
-        prompt: request.prompt,
-        response: request.response,
-        status: request.status
-      })),
-      status: restored.ticket.status,
-      ticketToken: restored.ticket.ticket_token
-    }
-  };
+  const savedLine: SavedJoinedLine = mapJoinedTicketRecord(restored);
 
   return NextResponse.json(savedLine);
 }

@@ -49,7 +49,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ code: "invalid_request" }, { status: 400 });
   }
 
-  const input = body as { answers?: unknown; code?: unknown };
+  const input = body as {
+    answers?: unknown;
+    code?: unknown;
+    joinWithAccount?: unknown;
+  };
   const code = normalizeLineCode(
     typeof input.code === "string" ? input.code : ""
   );
@@ -59,6 +63,7 @@ export async function POST(request: Request) {
     !Array.isArray(input.answers)
       ? input.answers
       : {};
+  const joinWithAccount = input.joinWithAccount === true;
 
   if (code.length !== 10) {
     return NextResponse.json({ code: "invalid_code" }, { status: 400 });
@@ -68,6 +73,17 @@ export async function POST(request: Request) {
 
   if (!supabase) {
     return NextResponse.json({ code: "configuration" }, { status: 503 });
+  }
+
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (joinWithAccount && !user) {
+    return NextResponse.json(
+      { code: "authentication_required" },
+      { status: 401 }
+    );
   }
 
   const { data, error } = await supabase.rpc("join_public_line", {

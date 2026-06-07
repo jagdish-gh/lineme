@@ -2,6 +2,19 @@
   "manageLine": {
     "eyebrow": "लाइव कतार नियंत्रण",
     "back": "अपनी कतारों पर वापस जाएं",
+    "lineName": "कतार का नाम",
+    "lineType": "कतार का प्रकार",
+    "lineCode": "कतार कोड",
+    "location": "स्थान",
+    "copyCode": "कोड कॉपी करें",
+    "codeCopied": "कॉपी हो गया",
+    "types": {
+      "clinic": "क्लिनिक",
+      "restaurant": "रेस्तरां",
+      "service": "सेवा",
+      "event": "कार्यक्रम",
+      "other": "अन्य"
+    },
     "lineStatus": {
       "active": "सक्रिय",
       "paused": "रुकी हुई",

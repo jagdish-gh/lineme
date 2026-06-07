@@ -1,0 +1,64 @@
+{
+  "tickets": {
+    "metadata": {
+      "title": "My joined tickets - LineME",
+      "description": "View your LineME ticket history across devices."
+    },
+    "back": "Back to join a queue",
+    "eyebrow": "Your joined queues",
+    "title": "My tickets",
+    "description": "See tickets saved on this device and signed-in tickets available across your devices.",
+    "loading": "Loading tickets saved on this device...",
+    "filters": {
+      "label": "Filter ticket history",
+      "all": "All",
+      "pending": "Pending",
+      "completed": "Served or closed",
+      "dropped": "Dropped out"
+    },
+    "categories": {
+      "pending": "Pending",
+      "completed": "Served or closed",
+      "dropped": "Dropped out"
+    },
+    "lineName": "Name",
+    "lineType": "Type",
+    "copyCode": "Copy code",
+    "codeCopied": "Copied",
+    "types": {
+      "clinic": "Clinic",
+      "restaurant": "Restaurant",
+      "service": "Service",
+      "event": "Event",
+      "other": "Other"
+    },
+    "yourNumber": "Your number",
+    "peopleAheadLabel": "Ahead of you",
+    "peopleAhead": "{count, plural, =0 {No one ahead} =1 {1 person ahead} other {# people ahead}}",
+    "ticketStatus": "Ticket status",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing...",
+    "refreshError": "This ticket could not be refreshed. Please try again.",
+    "leave": {
+      "button": "Leave line",
+      "title": "Leave this line?",
+      "description": "Leave {name}? Your ticket will be cancelled and you will lose your place.",
+      "cancel": "Keep my place",
+      "confirm": "Leave line",
+      "leaving": "Leaving...",
+      "error": "You could not leave this line right now. Please try again."
+    },
+    "joined": "Joined {date}",
+    "status": {
+      "waiting": "Waiting",
+      "called": "It is your turn",
+      "served": "Served",
+      "cancelled": "Dropped out"
+    },
+    "empty": {
+      "title": "No tickets in this filter",
+      "description": "Your ticket history will appear here after you join a queue."
+    },
+    "error": "Your ticket history could not be loaded right now. Please try again."
+  }
+}

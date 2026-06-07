@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   Clock3,
   Copy,
-  Link2,
   LoaderCircle,
   MapPin,
   RefreshCw,
@@ -16,11 +15,16 @@ import {
   UserMinus,
   UsersRound
 } from "lucide-react";
+import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { useCreatorSession } from "@/components/auth/use-creator-session";
+import { JoinAuthDialog } from "@/components/join-line/join-auth-dialog";
+import { JoinLineFaq } from "@/components/join-line/join-line-faq";
 import { QrCodeScanner } from "@/components/join-line/qr-code-scanner";
+import { CopyLineCodeButton } from "@/components/manage-lines/copy-line-code-button";
 import { ActionButton } from "@/components/ui/action-button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Surface } from "@/components/ui/surface";
@@ -32,7 +36,7 @@ import {
 } from "@/lib/lines/public-line";
 
 type JoinLineExperienceProps = {
-  initialCode: string;
+  initialCode?: string;
 };
 
 type RequestStatus = "idle" | "joining" | "searching";
@@ -53,11 +57,12 @@ function InlineError({ message }: { message: string }) {
 }
 
 export function JoinLineExperience({
-  initialCode
+  initialCode = ""
 }: JoinLineExperienceProps) {
   const locale = useLocale();
   const router = useRouter();
   const t = useTranslations("joinLine");
+  const { loading: authLoading, user } = useCreatorSession();
   const [code, setCode] = useState(normalizeLineCode(initialCode));
   const [line, setLine] = useState<PublicLine | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -65,9 +70,10 @@ export function JoinLineExperience({
   const [savedLines, setSavedLines] = useState<SavedJoinedLine[]>([]);
   const [loadingSaved, setLoadingSaved] = useState(true);
   const [status, setStatus] = useState<RequestStatus>("idle");
-  const [openingTicketToken, setOpeningTicketToken] = useState("");
   const [leaving, setLeaving] = useState(false);
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
+  const [joinAuthDialogOpen, setJoinAuthDialogOpen] = useState(false);
+  const [resumeJoinAfterLogin, setResumeJoinAfterLogin] = useState(false);
   const [requestResponses, setRequestResponses] = useState<Record<string, string>>({});
   const [respondingRequestId, setRespondingRequestId] = useState("");
   const [searchError, setSearchError] = useState("");
@@ -75,6 +81,7 @@ export function JoinLineExperience({
   const [joinError, setJoinError] = useState("");
   const [ticketError, setTicketError] = useState("");
   const [copied, setCopied] = useState(false);
+  const detailMode = normalizeLineCode(initialCode).length === 10;
 
   async function fetchSavedTicket(ticketToken: string) {
     try {
@@ -95,12 +102,70 @@ export function JoinLineExperience({
     }
   }
 
+  async function fetchAccountTickets() {
+    try {
+      const response = await fetch("/api/lines/public/tickets", {
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        return [];
+      }
+
+      const result = (await response.json()) as {
+        tickets?: SavedJoinedLine[];
+      };
+
+      return result.tickets ?? [];
+    } catch {
+      return [];
+    }
+  }
+
+  function mergeSavedLines(...groups: SavedJoinedLine[][]) {
+    const tickets = new Map<string, SavedJoinedLine>();
+
+    for (const group of groups) {
+      for (const savedLine of group) {
+        tickets.set(savedLine.ticket.ticketToken, savedLine);
+      }
+    }
+
+    return [...tickets.values()].sort(
+      (left, right) =>
+        new Date(right.ticket.joinedAt ?? 0).getTime() -
+        new Date(left.ticket.joinedAt ?? 0).getTime()
+    );
+  }
+
+  function isActiveTicket(savedLine: SavedJoinedLine) {
+    return ["waiting", "called"].includes(
+      savedLine.ticket.status ?? "waiting"
+    );
+  }
+
+  async function restoreAccountTicketForLine(foundLine: PublicLine) {
+    const accountTickets = await fetchAccountTickets();
+    const accountTicket = accountTickets.find(
+      (item) =>
+        item.line.public_code === foundLine.public_code &&
+        isActiveTicket(item)
+    );
+
+    if (accountTicket) {
+      setLine(accountTicket.line);
+      setTicket(accountTicket.ticket);
+      setSavedLines((current) => mergeSavedLines([accountTicket], current));
+    }
+  }
+
   async function restoreTicketForLine(foundLine: PublicLine) {
     const storedValue = window.localStorage.getItem(
       `lineme-ticket-${foundLine.public_code}`
     );
 
     if (!storedValue) {
+      await restoreAccountTicketForLine(foundLine);
       return;
     }
 
@@ -109,21 +174,23 @@ export function JoinLineExperience({
       const restored = await fetchSavedTicket(storedTicket.ticketToken);
 
       if (restored) {
-        setLine(restored.line);
-        setTicket(restored.ticket);
-        setSavedLines((current) => [
-          restored,
-          ...current.filter(
-            (item) => item.ticket.ticketToken !== restored.ticket.ticketToken
-          )
-        ]);
+        setSavedLines((current) => mergeSavedLines([restored], current));
+
+        if (isActiveTicket(restored)) {
+          setLine(restored.line);
+          setTicket(restored.ticket);
+        } else {
+          await restoreAccountTicketForLine(foundLine);
+        }
       } else {
         window.localStorage.removeItem(
           `lineme-ticket-${foundLine.public_code}`
         );
+        await restoreTicketForLine(foundLine);
       }
     } catch {
       window.localStorage.removeItem(`lineme-ticket-${foundLine.public_code}`);
+      await restoreTicketForLine(foundLine);
     }
   }
 
@@ -165,11 +232,48 @@ export function JoinLineExperience({
       }
 
       setLine(result.line);
-      setAnswers({});
+      const savedDraft = window.localStorage.getItem(
+        `lineme-join-draft-${result.line.public_code}`
+      );
+
+      if (savedDraft) {
+        try {
+          const parsedDraft = JSON.parse(savedDraft) as unknown;
+
+          if (
+            parsedDraft &&
+            typeof parsedDraft === "object" &&
+            "answers" in parsedDraft &&
+            parsedDraft.answers &&
+            typeof parsedDraft.answers === "object" &&
+            !Array.isArray(parsedDraft.answers)
+          ) {
+            setAnswers(parsedDraft.answers as Record<string, string>);
+            setResumeJoinAfterLogin(
+              "autoJoin" in parsedDraft && Boolean(parsedDraft.autoJoin)
+            );
+          } else if (
+            parsedDraft &&
+            typeof parsedDraft === "object" &&
+            !Array.isArray(parsedDraft)
+          ) {
+            setAnswers(parsedDraft as Record<string, string>);
+          } else {
+            throw new Error("Invalid join draft");
+          }
+        } catch {
+          setAnswers({});
+          window.localStorage.removeItem(
+            `lineme-join-draft-${result.line.public_code}`
+          );
+        }
+      } else {
+        setAnswers({});
+      }
       await restoreTicketForLine(result.line);
-      router.replace(`/${locale}/join/${result.line.public_code}`, {
-        scroll: false
-      });
+      if (!detailMode) {
+        router.push(`/${locale}/join/${result.line.public_code}`);
+      }
     } catch {
       setLookupError(t("errors.lookup"));
     } finally {
@@ -213,13 +317,18 @@ export function JoinLineExperience({
             return restored;
           })
         );
-        const restored = restoredResults.filter(
+        const restoredBrowserTickets = restoredResults.filter(
           (item): item is SavedJoinedLine => Boolean(item)
+        );
+        const accountTickets = await fetchAccountTickets();
+        const restored = mergeSavedLines(
+          accountTickets,
+          restoredBrowserTickets
         );
 
         setSavedLines(restored);
 
-        if (normalizeLineCode(initialCode).length === 10) {
+        if (detailMode) {
           await findLine(initialCode);
         }
       } finally {
@@ -232,19 +341,22 @@ export function JoinLineExperience({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function joinLine(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
+  async function submitJoin() {
     if (!line) {
       return;
     }
 
+    setJoinAuthDialogOpen(false);
     setJoinError("");
     setStatus("joining");
 
     try {
       const response = await fetch("/api/lines/public", {
-        body: JSON.stringify({ answers, code: line.public_code }),
+        body: JSON.stringify({
+          answers,
+          code: line.public_code,
+          joinWithAccount: Boolean(user)
+        }),
         headers: { "Content-Type": "application/json" },
         method: "POST"
       });
@@ -269,6 +381,9 @@ export function JoinLineExperience({
 
       const joinedTicket = { ...result.ticket, status: "waiting" as const };
       setTicket(joinedTicket);
+      window.localStorage.removeItem(
+        `lineme-join-draft-${line.public_code}`
+      );
       window.localStorage.setItem(
         `lineme-ticket-${line.public_code}`,
         JSON.stringify(joinedTicket)
@@ -279,12 +394,59 @@ export function JoinLineExperience({
           (item) => item.ticket.ticketToken !== joinedTicket.ticketToken
         )
       ]);
+      router.push(`/${locale}/tickets`);
     } catch {
       setJoinError(t("errors.join_failed"));
     } finally {
       setStatus("idle");
     }
   }
+
+  function joinLine(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (authLoading) {
+      return;
+    }
+
+    if (!user) {
+      setJoinAuthDialogOpen(true);
+      return;
+    }
+
+    void submitJoin();
+  }
+
+  function joinWithLogin() {
+    if (!line) {
+      return;
+    }
+
+    window.localStorage.setItem(
+      `lineme-join-draft-${line.public_code}`,
+      JSON.stringify({ answers, autoJoin: true })
+    );
+    const nextPath = `/${locale}/join/${line.public_code}`;
+    router.push(`/${locale}/auth?next=${encodeURIComponent(nextPath)}`);
+  }
+
+  useEffect(() => {
+    if (
+      authLoading ||
+      !user ||
+      !resumeJoinAfterLogin ||
+      !line ||
+      ticket ||
+      status !== "idle"
+    ) {
+      return;
+    }
+
+    setResumeJoinAfterLogin(false);
+    void submitJoin();
+    // submitJoin uses the current line and answers restored from the login draft.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, line, resumeJoinAfterLogin, status, ticket, user]);
 
   function handleScannedCode(scannedCode: string) {
     setCode(scannedCode);
@@ -348,44 +510,18 @@ export function JoinLineExperience({
     }
   }
 
-  async function openSavedLine(savedLine: SavedJoinedLine) {
-    setOpeningTicketToken(savedLine.ticket.ticketToken);
-    setTicketError("");
-    setLine(savedLine.line);
-    setTicket(savedLine.ticket);
-    setCode(savedLine.line.public_code);
-
-    try {
-      const restored = await fetchSavedTicket(savedLine.ticket.ticketToken);
-
-      if (!restored) {
-        setTicketError(t("errors.ticket_lookup"));
-        return;
-      }
-
-      setLine(restored.line);
-      setTicket(restored.ticket);
-      setCode(restored.line.public_code);
-      setSavedLines((current) => [
-        restored,
-        ...current.filter(
-          (item) => item.ticket.ticketToken !== restored.ticket.ticketToken
-        )
-      ]);
-      window.localStorage.setItem(
-        `lineme-ticket-${restored.line.public_code}`,
-        JSON.stringify(restored.ticket)
-      );
-    } finally {
-      setOpeningTicketToken("");
-    }
+  function closeTicket() {
+    router.push(`/${locale}/join`);
   }
 
-  function closeTicket() {
-    setLine(null);
+  function joinLineAgain() {
+    if (!line) {
+      return;
+    }
+
     setTicket(null);
-    setCode("");
     setTicketError("");
+    void findLine(line.public_code);
   }
 
   async function leaveLine() {
@@ -486,8 +622,65 @@ export function JoinLineExperience({
   }
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[0.88fr_1.12fr] lg:gap-6">
-      <div className="grid content-start gap-5">
+    <div
+      className={
+        detailMode
+          ? "grid gap-6 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)] lg:items-start"
+          : "grid gap-5"
+      }
+    >
+      <div className={detailMode ? "hidden" : "grid content-start gap-5"}>
+        <Link
+          href={`/${locale}/tickets`}
+          className="rounded-[2rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500"
+        >
+          <Surface className="p-4 transition hover:bg-white/85 sm:p-5 dark:hover:bg-white/15">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-base font-semibold text-slate-950 dark:text-white">
+                {t("saved.title")}
+              </h2>
+              <span className="shrink-0 text-xs font-semibold text-teal-700 dark:text-teal-200">
+                {t("saved.history")}
+              </span>
+            </div>
+            {savedLines[0] ? (
+              <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-slate-950/[0.035] px-4 py-3 dark:bg-white/[0.06]">
+              <span className="min-w-0">
+                <span className="block text-xs text-slate-500 dark:text-slate-400">
+                  {t("line.nameLabel")}
+                </span>
+                <span className="block truncate text-sm font-semibold text-slate-950 dark:text-white">
+                  {savedLines[0].line.name}
+                </span>
+                <span className="mt-1 block text-xs text-slate-500 dark:text-slate-400">
+                  {t("line.typeLabel")}:{" "}
+                  <span className="font-semibold text-slate-700 dark:text-slate-200">
+                    {savedLines[0].line.line_type === "other" &&
+                    savedLines[0].line.custom_line_type
+                      ? savedLines[0].line.custom_line_type
+                      : t(`line.types.${savedLines[0].line.line_type}`)}
+                  </span>
+                </span>
+                <span className="mt-0.5 block text-xs text-slate-500 dark:text-slate-400">
+                  {t(
+                    `success.status.${savedLines[0].ticket.status ?? "waiting"}`
+                  )}{" "}
+                  · {t("success.position")} {savedLines[0].ticket.positionNumber}
+                </span>
+              </span>
+                <TicketCheck
+                  aria-hidden="true"
+                  className="h-4 w-4 shrink-0 text-teal-600 dark:text-teal-300"
+                />
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+                {loadingSaved ? t("saved.loading") : t("saved.none")}
+              </p>
+            )}
+          </Surface>
+        </Link>
+
         <Surface className="p-5 sm:p-6">
           <div className="flex items-start gap-3">
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-teal-500/10 text-teal-700 dark:bg-teal-300/10 dark:text-teal-200">
@@ -542,26 +735,6 @@ export function JoinLineExperience({
         </Surface>
 
         <Surface className="p-5 sm:p-6">
-          <div className="flex items-start gap-3">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-sky-500/10 text-sky-700 dark:bg-sky-300/10 dark:text-sky-200">
-              <Share2 aria-hidden="true" className="h-5 w-5" />
-            </span>
-            <div>
-              <h2 className="text-lg font-semibold text-slate-950 dark:text-white">
-                {t("sharedLink.title")}
-              </h2>
-              <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                {t("sharedLink.description")}
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 flex items-center gap-2 rounded-2xl bg-slate-950/[0.035] px-4 py-3 text-xs text-slate-500 dark:bg-white/[0.06] dark:text-slate-400">
-            <Link2 aria-hidden="true" className="h-4 w-4 shrink-0 text-sky-600 dark:text-sky-300" />
-            <span className="truncate">lineme.app/{locale}/join/XXXXXXXXXX</span>
-          </div>
-        </Surface>
-
-        <Surface className="p-5 sm:p-6">
           <div className="mb-5 flex items-start gap-3">
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-violet-500/10 text-violet-700 dark:bg-violet-300/10 dark:text-violet-200">
               <ScanQrIcon />
@@ -581,9 +754,7 @@ export function JoinLineExperience({
       </div>
 
       <div
-        className={`min-w-0 ${
-          line || savedLines.length ? "order-first lg:order-none" : ""
-        }`}
+        className={detailMode ? "contents" : "hidden"}
       >
         {ticket && line ? (
           <Surface className="p-6 text-center sm:p-8">
@@ -593,7 +764,7 @@ export function JoinLineExperience({
               className="mb-2 inline-flex min-h-9 items-center gap-2 self-start rounded-xl px-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-950/5 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white sm:float-left"
             >
               <ArrowLeft aria-hidden="true" className="h-4 w-4" />
-              {t("saved.back")}
+              {t("detailBack")}
             </button>
             <div className="clear-both" />
             <span className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-emerald-500/10 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200">
@@ -602,9 +773,20 @@ export function JoinLineExperience({
             <p className="mt-5 text-sm font-semibold text-emerald-700 dark:text-emerald-200">
               {t(`success.status.${ticket.status ?? "waiting"}`)}
             </p>
-            <h2 className="mt-2 text-3xl font-semibold text-slate-950 dark:text-white">
-              {t("success.title", { name: line.name })}
+            <p className="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
+              {t("line.nameLabel")}
+            </p>
+            <h2 className="mt-1 text-3xl font-semibold text-slate-950 dark:text-white">
+              {line.name}
             </h2>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+              {t("line.typeLabel")}:{" "}
+              <span className="font-semibold text-slate-900 dark:text-white">
+                {line.line_type === "other" && line.custom_line_type
+                  ? line.custom_line_type
+                  : t(`line.types.${line.line_type}`)}
+              </span>
+            </p>
             <div className="mx-auto mt-6 grid max-w-md grid-cols-2 gap-3">
               <div className="rounded-2xl bg-slate-950/[0.035] p-4 dark:bg-white/[0.06]">
                 <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -718,6 +900,23 @@ export function JoinLineExperience({
                   {leaving ? t("leave.leaving") : t("leave.button")}
                 </ActionButton>
               </div>
+            ) : line.status === "active" ? (
+              <ActionButton
+                type="button"
+                className="mt-5"
+                disabled={status === "searching"}
+                onClick={joinLineAgain}
+              >
+                {status === "searching" ? (
+                  <LoaderCircle
+                    aria-hidden="true"
+                    className="h-4 w-4 animate-spin"
+                  />
+                ) : (
+                  <RefreshCw aria-hidden="true" className="h-4 w-4" />
+                )}
+                {t("success.joinAgain")}
+              </ActionButton>
             ) : null}
             <InlineError message={ticketError} />
           </Surface>
@@ -734,13 +933,31 @@ export function JoinLineExperience({
                 >
                   {t(`status.${line.status}`)}
                 </span>
-                <span className="font-mono text-xs font-bold tracking-[0.12em] text-slate-500 dark:text-slate-400">
-                  {line.public_code}
-                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-mono text-xs font-bold tracking-[0.12em] text-slate-500 dark:text-slate-400">
+                    {line.public_code}
+                  </span>
+                  <CopyLineCodeButton
+                    code={line.public_code}
+                    copiedLabel={t("line.codeCopied")}
+                    copyLabel={t("line.copyCode")}
+                  />
+                </div>
               </div>
-              <h2 className="mt-4 text-2xl font-semibold text-slate-950 dark:text-white sm:text-3xl">
+              <p className="mt-4 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
+                {t("line.nameLabel")}
+              </p>
+              <h2 className="mt-1 text-2xl font-semibold text-slate-950 dark:text-white sm:text-3xl">
                 {line.name}
               </h2>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                {t("line.typeLabel")}:{" "}
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {line.line_type === "other" && line.custom_line_type
+                    ? line.custom_line_type
+                    : t(`line.types.${line.line_type}`)}
+                </span>
+              </p>
               {line.location ? (
                 <p className="mt-2 flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
                   <MapPin
@@ -887,9 +1104,13 @@ export function JoinLineExperience({
               <ActionButton
                 type="submit"
                 className="mt-6 w-full"
-                disabled={status === "joining" || line.status !== "active"}
+                disabled={
+                  authLoading ||
+                  status === "joining" ||
+                  line.status !== "active"
+                }
               >
-                {status === "joining" ? (
+                {authLoading || status === "joining" ? (
                   <LoaderCircle aria-hidden="true" className="h-5 w-5 animate-spin" />
                 ) : null}
                 {line.status === "active"
@@ -899,78 +1120,45 @@ export function JoinLineExperience({
               <InlineError message={joinError} />
             </form>
           </Surface>
-        ) : savedLines.length ? (
-          <Surface className="p-5 sm:p-7">
-            <div className="flex items-start gap-3">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200">
-                <TicketCheck aria-hidden="true" className="h-5 w-5" />
-              </span>
-              <div>
-                <h2 className="text-xl font-semibold text-slate-950 dark:text-white">
-                  {t("saved.title")}
-                </h2>
-                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                  {t("saved.description")}
-                </p>
-              </div>
-            </div>
-            <div className="mt-5 grid gap-3">
-              {savedLines.map((savedLine) => (
-                <button
-                  key={savedLine.ticket.ticketToken}
-                  type="button"
-                  disabled={Boolean(openingTicketToken)}
-                  onClick={() => void openSavedLine(savedLine)}
-                  className="flex items-center justify-between gap-4 rounded-2xl border border-slate-950/10 bg-white/70 p-4 text-left transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
-                >
-                  <span className="min-w-0">
-                    <span className="block truncate font-semibold text-slate-950 dark:text-white">
-                      {savedLine.line.name}
-                    </span>
-                    <span className="mt-1 block text-xs text-slate-500 dark:text-slate-400">
-                      {t(
-                        `success.status.${savedLine.ticket.status ?? "waiting"}`
-                      )}{" "}
-                      · {t("success.position")} {savedLine.ticket.positionNumber}
-                    </span>
-                  </span>
-                  <span className="shrink-0 text-xs font-semibold text-teal-700 dark:text-teal-200">
-                    {openingTicketToken === savedLine.ticket.ticketToken ? (
-                      <LoaderCircle
-                        aria-hidden="true"
-                        className="h-4 w-4 animate-spin"
-                      />
-                    ) : (
-                      t("saved.open")
-                    )}
-                  </span>
-                </button>
-              ))}
-            </div>
+        ) : searchError ? (
+          <Surface className="p-7 text-center sm:p-9">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-rose-500/10 text-rose-700 dark:bg-rose-300/10 dark:text-rose-200">
+              <Search aria-hidden="true" className="h-6 w-6" />
+            </span>
+            <h2 className="mt-5 text-xl font-semibold text-slate-950 dark:text-white">
+              {t("detailErrorTitle")}
+            </h2>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600 dark:text-slate-300">
+              {searchError}
+            </p>
+            <Link
+              href={`/${locale}/join`}
+              className="mt-6 inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:border-white/15 dark:bg-white/5 dark:text-slate-100 dark:hover:bg-white/10"
+            >
+              {t("detailBack")}
+            </Link>
           </Surface>
         ) : (
-          <Surface className="grid min-h-64 place-items-center p-7 text-center sm:min-h-[28rem]">
-            <div className="max-w-md">
-              {loadingSaved ? (
-                <LoaderCircle
-                  aria-hidden="true"
-                  className="mx-auto h-7 w-7 animate-spin text-teal-600 dark:text-teal-300"
-                />
-              ) : (
-                <span className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-teal-500/10 text-teal-700 dark:bg-teal-300/10 dark:text-teal-200">
-                  <TicketCheck aria-hidden="true" className="h-7 w-7" />
-                </span>
-              )}
-              <h2 className="mt-5 text-2xl font-semibold text-slate-950 dark:text-white">
-                {t("empty.title")}
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                {t("empty.description")}
-              </p>
-            </div>
+          <Surface className="grid min-h-64 place-items-center p-7">
+            <LoaderCircle
+              aria-label={t("detailLoading")}
+              className="h-7 w-7 animate-spin text-teal-600 dark:text-teal-300"
+            />
           </Surface>
         )}
+        <JoinLineFaq />
       </div>
+      <JoinAuthDialog
+        open={joinAuthDialogOpen}
+        title={t("joinAuth.title")}
+        description={t("joinAuth.description")}
+        loginLabel={t("joinAuth.login")}
+        anonymousLabel={t("joinAuth.anonymous")}
+        closeLabel={t("joinAuth.close")}
+        onClose={() => setJoinAuthDialogOpen(false)}
+        onLogin={joinWithLogin}
+        onAnonymous={() => void submitJoin()}
+      />
       <ConfirmationDialog
         open={leaveDialogOpen}
         title={t("leave.title")}

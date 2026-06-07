@@ -10,6 +10,8 @@
     "createNew": "नई कतार बनाएं",
     "createFirst": "अपनी पहली कतार बनाएं",
     "lineCount": "{count, plural, =0 {अभी कोई कतार नहीं} =1 {1 कतार} other {# कतारें}}",
+    "lineName": "कतार का नाम",
+    "lineType": "कतार का प्रकार",
     "lineCode": "सार्वजनिक कतार कोड",
     "copyCode": "कोड कॉपी करें",
     "copied": "कॉपी हो गया",
@@ -26,6 +28,15 @@
     "pauseAllowed": "रोकने की अनुमति",
     "pauseDisabled": "रोकना बंद",
     "created": "{date} को बनाई",
+    "filters": {
+      "label": "स्थिति के अनुसार कतारें फिल्टर करें",
+      "all": "सभी",
+      "active": "सक्रिय",
+      "paused": "रुकी हुई",
+      "closed": "बंद",
+      "emptyTitle": "इस स्थिति में कोई कतार नहीं",
+      "emptyDescription": "अपनी दूसरी कतारें देखने के लिए कोई और स्थिति चुनें।"
+    },
     "status": {
       "active": "सक्रिय",
       "paused": "रुकी हुई",

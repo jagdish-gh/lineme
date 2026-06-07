@@ -24,6 +24,18 @@ export function CreatorSignIn({ errorCode, nextPath }: CreatorSignInProps) {
     errorCode ? t(`errors.${errorCode === "callback" ? "callback" : "configuration"}`) : ""
   );
 
+  async function saveRedirectIntent() {
+    const response = await fetch("/api/auth/redirect-intent", {
+      body: JSON.stringify({ next: nextPath }),
+      headers: { "Content-Type": "application/json" },
+      method: "POST"
+    });
+
+    if (!response.ok) {
+      throw new Error("Could not save the post-login destination");
+    }
+  }
+
   async function signInWithGoogle() {
     if (!supabase) {
       setError(t("errors.configuration"));
@@ -33,18 +45,24 @@ export function CreatorSignIn({ errorCode, nextPath }: CreatorSignInProps) {
     setError("");
     setStatus("loading");
 
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
-    const { error: signInError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo }
-    });
+    try {
+      await saveRedirectIntent();
+      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
+      const { error: signInError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo }
+      });
 
-    if (signInError) {
-      setError(
-        isProviderDisabledError(signInError)
-          ? t("errors.googleProviderDisabled")
-          : signInError.message
-      );
+      if (signInError) {
+        setError(
+          isProviderDisabledError(signInError)
+            ? t("errors.googleProviderDisabled")
+            : signInError.message
+        );
+        setStatus("idle");
+      }
+    } catch {
+      setError(t("errors.callback"));
       setStatus("idle");
     }
   }
@@ -60,22 +78,28 @@ export function CreatorSignIn({ errorCode, nextPath }: CreatorSignInProps) {
     setError("");
     setStatus("loading");
 
-    const emailRedirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
-    const { error: signInError } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo,
-        shouldCreateUser: true
+    try {
+      await saveRedirectIntent();
+      const emailRedirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
+      const { error: signInError } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo,
+          shouldCreateUser: true
+        }
+      });
+
+      if (signInError) {
+        setError(signInError.message);
+        setStatus("idle");
+        return;
       }
-    });
 
-    if (signInError) {
-      setError(signInError.message);
+      setStatus("sent");
+    } catch {
+      setError(t("errors.callback"));
       setStatus("idle");
-      return;
     }
-
-    setStatus("sent");
   }
 
   return (

@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { CreatorSignIn } from "@/components/auth/creator-sign-in";
 import { locales, type Locale } from "@/i18n/routing";
+import { getSafeAuthRedirectPath } from "@/lib/auth/redirect-path";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type AuthPageProps = {
@@ -17,9 +18,10 @@ type AuthPageProps = {
 export const dynamic = "force-dynamic";
 
 function getSafeNextPath(locale: string, value?: string) {
-  return value?.startsWith("/") && !value.startsWith("//")
-    ? value
-    : `/${locale}/create?resume=publish`;
+  return getSafeAuthRedirectPath(
+    value,
+    `/${locale}/create?resume=publish`
+  );
 }
 
 export async function generateMetadata({ params }: AuthPageProps): Promise<Metadata> {

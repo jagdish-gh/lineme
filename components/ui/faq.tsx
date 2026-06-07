@@ -15,7 +15,7 @@ type FaqProps = {
   className?: string;
   icon?: LucideIcon;
   items: FaqItem[];
-  openItemIndex?: number;
+  openItemIndex?: number | null;
   subtitle?: string;
   title: string;
 };

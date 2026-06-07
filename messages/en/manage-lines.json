@@ -10,6 +10,8 @@
     "createNew": "Create a new queue",
     "createFirst": "Create your first queue",
     "lineCount": "{count, plural, =0 {No queues yet} =1 {1 queue} other {# queues}}",
+    "lineName": "Name",
+    "lineType": "Type",
     "lineCode": "Public queue code",
     "copyCode": "Copy code",
     "copied": "Copied",
@@ -26,6 +28,15 @@
     "pauseAllowed": "Pausing allowed",
     "pauseDisabled": "Pausing disabled",
     "created": "Created {date}",
+    "filters": {
+      "label": "Filter queues by status",
+      "all": "All",
+      "active": "Active",
+      "paused": "Paused",
+      "closed": "Closed",
+      "emptyTitle": "No queues in this status",
+      "emptyDescription": "Choose another status to view your other queues."
+    },
     "status": {
       "active": "Active",
       "paused": "Paused",
