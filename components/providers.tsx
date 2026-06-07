@@ -2,6 +2,8 @@
 
 import { ThemeProvider } from "next-themes";
 
+import { MixpanelIdentity } from "@/components/analytics/mixpanel-identity";
+
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider
@@ -11,6 +13,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange={false}
       storageKey="lineme-theme"
     >
+      <MixpanelIdentity />
       {children}
     </ThemeProvider>
   );

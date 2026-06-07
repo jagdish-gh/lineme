@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { OAuthAvatar } from "@/components/auth/oauth-avatar";
 import { cn } from "@/lib/utils";
 
 type UserAvatarProps = {
@@ -108,13 +109,7 @@ export function UserAvatar({ className, label, user }: UserAvatarProps) {
         className="group inline-flex h-10 items-center gap-1 rounded-full border border-slate-200 bg-white p-0.5 pr-1.5 text-slate-700 shadow-sm transition hover:border-teal-500/40 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:border-white/15 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15"
       >
         <span className="relative inline-grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-          {avatarUrl ? (
-            // OAuth avatar URLs are dynamic and can come from different identity providers.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img alt="" className="h-full w-full object-cover" src={avatarUrl} />
-          ) : (
-            <UserRound aria-hidden="true" className="h-5 w-5" />
-          )}
+          <OAuthAvatar size={36} src={avatarUrl} />
           <span
             aria-hidden="true"
             className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-emerald-500 dark:border-slate-900"

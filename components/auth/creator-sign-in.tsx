@@ -7,6 +7,10 @@ import { useTranslations } from "next-intl";
 import { ActionButton } from "@/components/ui/action-button";
 import { Surface } from "@/components/ui/surface";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import {
+  clearPendingSignUpMethod,
+  setPendingSignUpMethod
+} from "@/lib/analytics/mixpanel";
 import { isProviderDisabledError } from "@/lib/supabase/auth-error";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -47,6 +51,7 @@ export function CreatorSignIn({ errorCode, nextPath }: CreatorSignInProps) {
 
     try {
       await saveRedirectIntent();
+      setPendingSignUpMethod("google");
       const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
       const { error: signInError } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -54,6 +59,7 @@ export function CreatorSignIn({ errorCode, nextPath }: CreatorSignInProps) {
       });
 
       if (signInError) {
+        clearPendingSignUpMethod();
         setError(
           isProviderDisabledError(signInError)
             ? t("errors.googleProviderDisabled")
@@ -62,6 +68,7 @@ export function CreatorSignIn({ errorCode, nextPath }: CreatorSignInProps) {
         setStatus("idle");
       }
     } catch {
+      clearPendingSignUpMethod();
       setError(t("errors.callback"));
       setStatus("idle");
     }
@@ -80,16 +87,21 @@ export function CreatorSignIn({ errorCode, nextPath }: CreatorSignInProps) {
 
     try {
       await saveRedirectIntent();
+      setPendingSignUpMethod("email");
       const emailRedirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
       const { error: signInError } = await supabase.auth.signInWithOtp({
         email,
         options: {
+          data: {
+            lineme_sign_up_method: "email"
+          },
           emailRedirectTo,
           shouldCreateUser: true
         }
       });
 
       if (signInError) {
+        clearPendingSignUpMethod();
         setError(signInError.message);
         setStatus("idle");
         return;
@@ -97,6 +109,7 @@ export function CreatorSignIn({ errorCode, nextPath }: CreatorSignInProps) {
 
       setStatus("sent");
     } catch {
+      clearPendingSignUpMethod();
       setError(t("errors.callback"));
       setStatus("idle");
     }

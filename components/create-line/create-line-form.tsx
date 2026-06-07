@@ -25,6 +25,7 @@ import {
   type CreatedLine,
   type CreateLineErrorCode
 } from "@/lib/lines/create-line";
+import { MixpanelEvent, trackEvent } from "@/lib/analytics/mixpanel";
 
 export function CreateLineForm() {
   const t = useTranslations("createLine");
@@ -91,6 +92,15 @@ export function CreateLineForm() {
                     const result = await createLine(form);
                     clearCreateLineDraft();
                     setCreatedLine(result);
+                    trackEvent(MixpanelEvent.LineCreated, {
+                      allow_pause: form.allowPause,
+                      auto_notify: form.autoNotify,
+                      has_capacity: form.capacity !== "",
+                      has_service_estimate: form.estimatedMinutes !== "",
+                      line_id: result.id,
+                      line_type: form.queueType,
+                      question_count: form.joinQuestions.length
+                    });
                   } catch (error) {
                     const code =
                       error instanceof CreateLineRequestError

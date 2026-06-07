@@ -13,6 +13,7 @@ import { getFormatter, getTranslations, setRequestLocale } from "next-intl/serve
 import { notFound, redirect } from "next/navigation";
 
 import { ProfileLogoutButton } from "@/components/auth/profile-logout-button";
+import { OAuthAvatar } from "@/components/auth/oauth-avatar";
 import { PageEyebrow } from "@/components/ui/page-eyebrow";
 import { Surface } from "@/components/ui/surface";
 import { locales, type Locale } from "@/i18n/routing";
@@ -152,17 +153,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           <div className="flex flex-col gap-5 border-b border-slate-950/5 p-6 sm:flex-row sm:items-center sm:justify-between dark:border-white/10 sm:p-8">
             <div className="flex min-w-0 items-center gap-4">
               <span className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-3xl bg-teal-500/10 text-teal-700 dark:bg-teal-300/10 dark:text-teal-200">
-                {avatarUrl ? (
-                  // OAuth avatar URLs are dynamic and can come from different identity providers.
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    alt=""
-                    className="h-full w-full object-cover"
-                    src={avatarUrl}
-                  />
-                ) : (
-                  <UserRound aria-hidden="true" className="h-8 w-8" />
-                )}
+                <OAuthAvatar
+                  fallbackClassName="h-8 w-8"
+                  size={80}
+                  src={avatarUrl}
+                />
               </span>
               <div className="min-w-0">
                 {name && <h2 className="truncate text-2xl font-semibold text-slate-950 dark:text-white">

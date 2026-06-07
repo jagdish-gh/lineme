@@ -34,12 +34,14 @@ import {
   type PublicLine,
   type SavedJoinedLine
 } from "@/lib/lines/public-line";
+import { MixpanelEvent, trackEvent } from "@/lib/analytics/mixpanel";
 
 type JoinLineExperienceProps = {
   initialCode?: string;
 };
 
 type RequestStatus = "idle" | "joining" | "searching";
+type LineDiscoveryMethod = "qr" | "search" | "share_link";
 
 function InlineError({ message }: { message: string }) {
   if (!message) {
@@ -82,6 +84,8 @@ export function JoinLineExperience({
   const [ticketError, setTicketError] = useState("");
   const [copied, setCopied] = useState(false);
   const detailMode = normalizeLineCode(initialCode).length === 10;
+  const [lineDiscoveryMethod, setLineDiscoveryMethod] =
+    useState<LineDiscoveryMethod>(detailMode ? "share_link" : "search");
 
   async function fetchSavedTicket(ticketToken: string) {
     try {
@@ -194,7 +198,10 @@ export function JoinLineExperience({
     }
   }
 
-  async function findLine(value = code, source: "qr" | "search" = "search") {
+  async function findLine(
+    value = code,
+    source: LineDiscoveryMethod = "search"
+  ) {
     const normalizedCode = normalizeLineCode(value);
     const setLookupError = source === "qr" ? setQrError : setSearchError;
 
@@ -204,6 +211,7 @@ export function JoinLineExperience({
     }
 
     setCode(normalizedCode);
+    setLineDiscoveryMethod(source);
     setSearchError("");
     setQrError("");
     setJoinError("");
@@ -329,7 +337,7 @@ export function JoinLineExperience({
         setSavedLines(restored);
 
         if (detailMode) {
-          await findLine(initialCode);
+          await findLine(initialCode, "share_link");
         }
       } finally {
         setLoadingSaved(false);
@@ -394,6 +402,11 @@ export function JoinLineExperience({
           (item) => item.ticket.ticketToken !== joinedTicket.ticketToken
         )
       ]);
+      trackEvent(MixpanelEvent.LineJoined, {
+        join_method: lineDiscoveryMethod,
+        line_id: line.id,
+        line_type: line.line_type
+      });
       router.push(`/${locale}/tickets`);
     } catch {
       setJoinError(t("errors.join_failed"));
@@ -564,6 +577,9 @@ export function JoinLineExperience({
       setTicket(null);
       setCode("");
       setLeaveDialogOpen(false);
+      trackEvent(MixpanelEvent.LineLeft, {
+        line_id: line.id
+      });
     } catch {
       setLeaveDialogOpen(false);
       setTicketError(t("errors.leave_failed"));
@@ -573,7 +589,7 @@ export function JoinLineExperience({
   }
 
   async function respondToRequest(requestId: string) {
-    if (!ticket) {
+    if (!line || !ticket) {
       return;
     }
 
@@ -614,6 +630,9 @@ export function JoinLineExperience({
           )
         ]);
       }
+      trackEvent(MixpanelEvent.AdditionalInfoSubmitted, {
+        line_id: line.id
+      });
     } catch {
       setTicketError(t("errors.response_failed"));
     } finally {

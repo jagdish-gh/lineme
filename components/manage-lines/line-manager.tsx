@@ -22,6 +22,7 @@ import { RequestInfoDialog } from "@/components/manage-lines/request-info-dialog
 import { ActionButton } from "@/components/ui/action-button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Surface } from "@/components/ui/surface";
+import { MixpanelEvent, trackEvent } from "@/lib/analytics/mixpanel";
 
 type Question = { id: string; label: string; position: number };
 type Request = {
@@ -131,6 +132,14 @@ export function LineManager({
         return;
       }
 
+      if (action === "serve") {
+        trackEvent(MixpanelEvent.MemberServed, { line_id: lineId });
+      } else {
+        trackEvent(MixpanelEvent.MemberCalled, {
+          call_method: action === "call_next" ? "next" : "selected",
+          line_id: lineId
+        });
+      }
       router.refresh();
     } catch {
       setError(t("errors.actionFailed"));
@@ -156,6 +165,9 @@ export function LineManager({
         return;
       }
 
+      trackEvent(MixpanelEvent.AdditionalInfoRequested, {
+        line_id: lineId
+      });
       setRequestEntry(null);
       router.refresh();
     } catch {
@@ -190,6 +202,18 @@ export function LineManager({
         return;
       }
 
+      const newStatus =
+        action === "expire"
+          ? "closed"
+          : action === "resume"
+            ? "active"
+            : "paused";
+      trackEvent(MixpanelEvent.LineStatusChanged, {
+        line_id: lineId,
+        new_status: newStatus,
+        pause_duration_minutes: action === "pause_30" ? 30 : undefined,
+        previous_status: lineStatus
+      });
       setExpireDialogOpen(false);
       router.refresh();
     } catch {
