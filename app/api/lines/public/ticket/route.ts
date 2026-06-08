@@ -7,7 +7,7 @@ import {
 import { mapJoinedTicketRecord } from "@/lib/lines/joined-tickets";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-type TicketStatus = "called" | "cancelled" | "served" | "waiting";
+type TicketStatus = "called" | "cancelled" | "no_show" | "served" | "waiting";
 
 function getTicketToken(body: unknown) {
   return body &&

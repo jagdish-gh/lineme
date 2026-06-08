@@ -36,8 +36,9 @@
       "errorDescription": "Allow camera access and try again, or enter the line code."
     },
     "saved": {
-      "title": "Lines you already joined",
-      "history": "View all ticket history",
+      "title": "Already booked a ticket?",
+      "description": "Open your saved tickets to check status, position, or your turn.",
+      "history": "View tickets",
       "loading": "Loading your latest ticket...",
       "none": "No joined tickets yet.",
       "refresh": "Refresh position"
@@ -132,12 +133,14 @@
       "saved": "Your ticket is saved. Signed-in tickets are also available across your devices.",
       "servedInfo": "This ticket has already been served. No further queue updates are needed.",
       "cancelledInfo": "This ticket was cancelled and is no longer active.",
+      "noShowInfo": "This ticket was marked as no-show. Please join again if you still need service.",
       "joinAgain": "Join this line again",
       "status": {
         "waiting": "Waiting",
         "called": "It is your turn",
         "served": "Completed",
-        "cancelled": "Cancelled"
+        "cancelled": "Cancelled",
+        "no_show": "No-show"
       }
     },
     "share": "Share line",

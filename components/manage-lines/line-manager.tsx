@@ -12,13 +12,15 @@ import {
   Play,
   RefreshCw,
   UserRound,
+  UserX,
   UsersRound
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { RequestInfoDialog } from "@/components/manage-lines/request-info-dialog";
+import { useLineManagerRealtime } from "@/components/manage-lines/use-line-manager-realtime";
 import { ActionButton } from "@/components/ui/action-button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Surface } from "@/components/ui/surface";
@@ -39,7 +41,7 @@ export type ManagedEntry = {
   joined_at: string;
   line_entry_requests: Request[];
   position_number: number;
-  status: "called" | "cancelled" | "served" | "waiting";
+  status: "called" | "cancelled" | "no_show" | "served" | "waiting";
 };
 
 type LineManagerProps = {
@@ -55,7 +57,8 @@ const statusStyles = {
   waiting: "bg-amber-500/10 text-amber-700 dark:text-amber-200",
   called: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-200",
   served: "bg-slate-500/10 text-slate-600 dark:text-slate-300",
-  cancelled: "bg-rose-500/10 text-rose-700 dark:text-rose-200"
+  cancelled: "bg-rose-500/10 text-rose-700 dark:text-rose-200",
+  no_show: "bg-orange-500/10 text-orange-700 dark:text-orange-200"
 };
 
 export function LineManager({
@@ -68,12 +71,13 @@ export function LineManager({
 }: LineManagerProps) {
   const t = useTranslations("manageLine");
   const router = useRouter();
+  const refreshLine = useCallback(() => router.refresh(), [router]);
   const [busyAction, setBusyAction] = useState("");
   const [error, setError] = useState("");
   const [requestEntry, setRequestEntry] = useState<ManagedEntry | null>(null);
   const [requestError, setRequestError] = useState("");
   const [requesting, setRequesting] = useState(false);
-  const [filter, setFilter] = useState<"active" | "all">("active");
+  const [filter, setFilter] = useState<"active" | "all" | "no_show">("active");
   const [statusAction, setStatusAction] = useState("");
   const [expireDialogOpen, setExpireDialogOpen] = useState(false);
 
@@ -81,24 +85,29 @@ export function LineManager({
     () => new Map(questions.map((question) => [question.id, question.label])),
     [questions]
   );
+  const entryIds = useMemo(() => entries.map((entry) => entry.id), [entries]);
   const activeEntries = entries.filter((entry) =>
     ["waiting", "called"].includes(entry.status)
   );
+  const noShowEntries = entries.filter((entry) => entry.status === "no_show");
   const visibleEntries =
     filter === "active"
       ? activeEntries
+      : filter === "no_show"
+        ? noShowEntries
       : entries;
   const calledEntry = entries.find((entry) => entry.status === "called");
 
   useEffect(() => {
     const interval = window.setInterval(() => {
       if (!busyAction && !requestEntry && !requesting) {
-        router.refresh();
+        refreshLine();
       }
     }, 10000);
 
     return () => window.clearInterval(interval);
-  }, [busyAction, requestEntry, requesting, router]);
+  }, [busyAction, refreshLine, requestEntry, requesting]);
+  useLineManagerRealtime({ entryIds, lineId, onRefresh: refreshLine });
 
   function memberLabel(entry: ManagedEntry) {
     const firstAnswer = [...questions]
@@ -108,7 +117,7 @@ export function LineManager({
     return firstAnswer || t("memberNumber", { number: entry.position_number });
   }
 
-  async function runAction(action: "call" | "call_next" | "serve", entryId?: string) {
+  async function runAction(action: "call" | "call_next" | "no_show" | "serve", entryId?: string) {
     const key = `${action}:${entryId ?? "next"}`;
     setBusyAction(key);
     setError("");
@@ -127,6 +136,8 @@ export function LineManager({
             ? t("errors.noWaiting")
             : result.code === "member_not_available"
               ? t("errors.memberUnavailable")
+              : result.code === "database_not_ready"
+                ? t("errors.databaseNotReady")
               : t("errors.actionFailed")
         );
         return;
@@ -341,6 +352,7 @@ export function LineManager({
             <RefreshCw className="h-4 w-4" />
           </button>
           <button type="button" onClick={() => setFilter("active")} className={`rounded-xl px-3 py-2 text-xs font-semibold ${filter === "active" ? "bg-teal-600 text-white" : "bg-white/70 text-slate-600 dark:bg-white/10 dark:text-slate-300"}`}>{t("filters.active")}</button>
+          <button type="button" onClick={() => setFilter("no_show")} className={`rounded-xl px-3 py-2 text-xs font-semibold ${filter === "no_show" ? "bg-teal-600 text-white" : "bg-white/70 text-slate-600 dark:bg-white/10 dark:text-slate-300"}`}>{t("filters.no_show")}</button>
           <button type="button" onClick={() => setFilter("all")} className={`rounded-xl px-3 py-2 text-xs font-semibold ${filter === "all" ? "bg-teal-600 text-white" : "bg-white/70 text-slate-600 dark:bg-white/10 dark:text-slate-300"}`}>{t("filters.all")}</button>
         </div>
       </div>
@@ -369,6 +381,11 @@ export function LineManager({
                     <ActionButton type="button" size="small" variant="secondary" disabled={Boolean(busyAction)} onClick={() => void runAction("serve", entry.id)}>
                       <CheckCheck className="h-4 w-4" />{t("actions.served")}
                     </ActionButton>
+                    {entry.status === "called" ? (
+                      <ActionButton type="button" size="small" variant="secondary" disabled={Boolean(busyAction)} onClick={() => void runAction("no_show", entry.id)}>
+                        <UserX className="h-4 w-4" />{t("actions.noShow")}
+                      </ActionButton>
+                    ) : null}
                     <ActionButton type="button" size="small" variant="secondary" onClick={() => setRequestEntry(entry)}>
                       <MessageSquarePlus className="h-4 w-4" />{t("actions.requestInfo")}
                     </ActionButton>

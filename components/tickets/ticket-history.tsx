@@ -8,26 +8,32 @@ import {
   MapPin,
   RefreshCw,
   TicketCheck,
-  UserMinus
+  UserMinus,
+  UserX
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CopyLineCodeButton } from "@/components/manage-lines/copy-line-code-button";
+import { useTicketRealtime } from "@/components/tickets/use-ticket-realtime";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Surface } from "@/components/ui/surface";
 import { type SavedJoinedLine } from "@/lib/lines/public-line";
 import { cn } from "@/lib/utils";
 
-type TicketFilter = "all" | "completed" | "dropped" | "pending";
+type TicketFilter = "all" | "completed" | "dropped" | "no_show" | "pending";
 
 type TicketHistoryProps = {
   tickets: SavedJoinedLine[];
 };
 
-const filters: TicketFilter[] = ["pending", "completed", "dropped", "all"];
+const filters: TicketFilter[] = ["pending", "completed", "no_show", "dropped", "all"];
 
 function getTicketFilter(ticket: SavedJoinedLine): Exclude<TicketFilter, "all"> {
+  if (ticket.ticket.status === "no_show") {
+    return "no_show";
+  }
+
   if (ticket.ticket.status === "cancelled") {
     return "dropped";
   }
@@ -44,6 +50,8 @@ const categoryStyles = {
     "bg-amber-500/10 text-amber-700 dark:bg-amber-300/10 dark:text-amber-200",
   completed:
     "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200",
+  no_show:
+    "bg-orange-500/10 text-orange-700 dark:bg-orange-300/10 dark:text-orange-200",
   dropped:
     "bg-slate-500/10 text-slate-600 dark:bg-slate-300/10 dark:text-slate-300"
 };
@@ -75,6 +83,35 @@ export function TicketHistory({ tickets }: TicketHistoryProps) {
       }),
     [locale]
   );
+  const realtimeTargets = useMemo(
+    () =>
+      history
+        .filter((ticket) => getTicketFilter(ticket) === "pending")
+        .map((ticket) => ({
+          entryId: ticket.ticket.entryId,
+          lineId: ticket.line.id,
+          ticketToken: ticket.ticket.ticketToken
+        })),
+    [history]
+  );
+
+  useEffect(() => {
+    setHistory((current) => {
+      const merged = new Map(
+        current.map((ticket) => [ticket.ticket.ticketToken, ticket])
+      );
+
+      for (const ticket of tickets) {
+        merged.set(ticket.ticket.ticketToken, ticket);
+      }
+
+      return [...merged.values()].sort(
+        (a, b) =>
+          new Date(b.ticket.joinedAt ?? 0).getTime() -
+          new Date(a.ticket.joinedAt ?? 0).getTime()
+      );
+    });
+  }, [tickets]);
 
   useEffect(() => {
     let active = true;
@@ -150,37 +187,61 @@ export function TicketHistory({ tickets }: TicketHistoryProps) {
     };
   }, []);
 
-  async function refreshTicket(ticket: SavedJoinedLine) {
-    const entryId = ticket.ticket.entryId;
-    setRefreshingTicketId(entryId);
-    setRefreshErrors((current) => ({ ...current, [entryId]: "" }));
-
-    try {
-      const response = await fetch("/api/lines/public/ticket", {
-        body: JSON.stringify({ ticketToken: ticket.ticket.ticketToken }),
-        cache: "no-store",
-        headers: { "Content-Type": "application/json" },
-        method: "POST"
-      });
-
-      if (!response.ok) {
-        throw new Error("Ticket refresh failed");
+  const refreshTicketByToken = useCallback(
+    async (ticketToken: string, entryId: string, showInlineError = true) => {
+      if (showInlineError) {
+        setRefreshingTicketId(entryId);
+        setRefreshErrors((current) => ({ ...current, [entryId]: "" }));
       }
 
-      const refreshed = (await response.json()) as SavedJoinedLine;
-      setHistory((current) =>
-        current.map((item) =>
-          item.ticket.entryId === entryId ? refreshed : item
-        )
-      );
-    } catch {
-      setRefreshErrors((current) => ({
-        ...current,
-        [entryId]: t("refreshError")
-      }));
-    } finally {
-      setRefreshingTicketId("");
-    }
+      try {
+        const response = await fetch("/api/lines/public/ticket", {
+          body: JSON.stringify({ ticketToken }),
+          cache: "no-store",
+          headers: { "Content-Type": "application/json" },
+          method: "POST"
+        });
+
+        if (!response.ok) {
+          throw new Error("Ticket refresh failed");
+        }
+
+        const refreshed = (await response.json()) as SavedJoinedLine;
+        setHistory((current) =>
+          current.map((item) =>
+            item.ticket.entryId === entryId ? refreshed : item
+          )
+        );
+        window.localStorage.setItem(
+          `lineme-ticket-${refreshed.line.public_code}`,
+          JSON.stringify(refreshed.ticket)
+        );
+      } catch {
+        if (showInlineError) {
+          setRefreshErrors((current) => ({
+            ...current,
+            [entryId]: t("refreshError")
+          }));
+        }
+      } finally {
+        if (showInlineError) {
+          setRefreshingTicketId("");
+        }
+      }
+    },
+    [t]
+  );
+
+  useTicketRealtime({
+    onRefreshTicket: refreshTicketByToken,
+    targets: realtimeTargets
+  });
+
+  async function refreshTicket(ticket: SavedJoinedLine) {
+    await refreshTicketByToken(
+      ticket.ticket.ticketToken,
+      ticket.ticket.entryId
+    );
   }
 
   async function leaveTicket() {
@@ -290,6 +351,8 @@ export function TicketHistory({ tickets }: TicketHistoryProps) {
                 ? Clock3
                 : category === "completed"
                   ? CheckCircle2
+                  : category === "no_show"
+                    ? UserX
                   : CircleSlash2;
 
             return (

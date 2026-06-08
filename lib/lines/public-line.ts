@@ -26,7 +26,7 @@ export type JoinedLineTicket = {
   peopleAhead: number;
   positionNumber: number;
   requests?: LineEntryRequest[];
-  status?: "called" | "cancelled" | "served" | "waiting";
+  status?: "called" | "cancelled" | "no_show" | "served" | "waiting";
   ticketToken: string;
 };
 

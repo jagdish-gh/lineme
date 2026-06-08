@@ -9,16 +9,22 @@
     "title": "My tickets",
     "description": "See tickets saved on this device and signed-in tickets available across your devices.",
     "loading": "Loading tickets saved on this device...",
+    "pendingJoin": {
+      "loading": "Finishing your line join...",
+      "error": "You are signed in, but this line could not be joined automatically. Please try joining again."
+    },
     "filters": {
       "label": "Filter ticket history",
       "all": "All",
       "pending": "Pending",
       "completed": "Served or closed",
+      "no_show": "No-show",
       "dropped": "Dropped out"
     },
     "categories": {
       "pending": "Pending",
       "completed": "Served or closed",
+      "no_show": "No-show",
       "dropped": "Dropped out"
     },
     "lineName": "Name",
@@ -53,7 +59,19 @@
       "waiting": "Waiting",
       "called": "It is your turn",
       "served": "Served",
-      "cancelled": "Dropped out"
+      "cancelled": "Dropped out",
+      "no_show": "No-show"
+    },
+    "turnNotification": {
+      "eyebrow": "Now serving",
+      "title": "It is your turn",
+      "description": "{name} is ready for you now.",
+      "ticketNumber": "Ticket number",
+      "ahead": "Ahead",
+      "instruction": "Please head to the service area and keep this ticket ready.",
+      "viewTicket": "View ticket",
+      "dismiss": "Dismiss notification",
+      "dismissShort": "Dismiss"
     },
     "empty": {
       "title": "No tickets in this filter",

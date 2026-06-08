@@ -54,7 +54,8 @@
       "waiting": "Waiting",
       "called": "Called",
       "served": "Served",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "no_show": "No-show"
     },
     "members": {
       "title": "Queue members",
@@ -63,11 +64,13 @@
     },
     "filters": {
       "active": "Active",
+      "no_show": "No-show",
       "all": "All"
     },
     "actions": {
       "call": "Call",
       "served": "Mark served",
+      "noShow": "No-show",
       "requestInfo": "Ask for info"
     },
     "requests": {
@@ -84,6 +87,7 @@
     "errors": {
       "noWaiting": "There is no waiting member to call.",
       "memberUnavailable": "This member is no longer available for that action.",
+      "databaseNotReady": "No-show is not available until the latest database migration is applied.",
       "actionFailed": "The queue action could not be completed. Please try again.",
       "requestFailed": "The information request could not be sent."
       ,

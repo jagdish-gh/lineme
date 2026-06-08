@@ -18,7 +18,7 @@ type JoinedTicketRecord = {
       response: string | null;
       status: "answered" | "cancelled" | "pending";
     }>;
-    status: "called" | "cancelled" | "served" | "waiting";
+    status: "called" | "cancelled" | "no_show" | "served" | "waiting";
     ticket_token: string;
   };
 };

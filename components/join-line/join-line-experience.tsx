@@ -2,6 +2,7 @@
 
 import {
   ArrowLeft,
+  ArrowRight,
   Check,
   CheckCircle2,
   Clock3,
@@ -25,6 +26,7 @@ import { JoinAuthDialog } from "@/components/join-line/join-auth-dialog";
 import { JoinLineFaq } from "@/components/join-line/join-line-faq";
 import { QrCodeScanner } from "@/components/join-line/qr-code-scanner";
 import { CopyLineCodeButton } from "@/components/manage-lines/copy-line-code-button";
+import { pendingAccountJoinStorageKey } from "@/components/tickets/pending-account-join";
 import { ActionButton } from "@/components/ui/action-button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Surface } from "@/components/ui/surface";
@@ -69,8 +71,6 @@ export function JoinLineExperience({
   const [line, setLine] = useState<PublicLine | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [ticket, setTicket] = useState<JoinedLineTicket | null>(null);
-  const [savedLines, setSavedLines] = useState<SavedJoinedLine[]>([]);
-  const [loadingSaved, setLoadingSaved] = useState(true);
   const [status, setStatus] = useState<RequestStatus>("idle");
   const [leaving, setLeaving] = useState(false);
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
@@ -126,22 +126,6 @@ export function JoinLineExperience({
     }
   }
 
-  function mergeSavedLines(...groups: SavedJoinedLine[][]) {
-    const tickets = new Map<string, SavedJoinedLine>();
-
-    for (const group of groups) {
-      for (const savedLine of group) {
-        tickets.set(savedLine.ticket.ticketToken, savedLine);
-      }
-    }
-
-    return [...tickets.values()].sort(
-      (left, right) =>
-        new Date(right.ticket.joinedAt ?? 0).getTime() -
-        new Date(left.ticket.joinedAt ?? 0).getTime()
-    );
-  }
-
   function isActiveTicket(savedLine: SavedJoinedLine) {
     return ["waiting", "called"].includes(
       savedLine.ticket.status ?? "waiting"
@@ -159,7 +143,6 @@ export function JoinLineExperience({
     if (accountTicket) {
       setLine(accountTicket.line);
       setTicket(accountTicket.ticket);
-      setSavedLines((current) => mergeSavedLines([accountTicket], current));
     }
   }
 
@@ -178,8 +161,6 @@ export function JoinLineExperience({
       const restored = await fetchSavedTicket(storedTicket.ticketToken);
 
       if (restored) {
-        setSavedLines((current) => mergeSavedLines([restored], current));
-
         if (isActiveTicket(restored)) {
           setLine(restored.line);
           setTicket(restored.ticket);
@@ -290,61 +271,17 @@ export function JoinLineExperience({
   }
 
   useEffect(() => {
-    async function restoreSavedLines() {
-      const ticketKeys = Array.from(
-        { length: window.localStorage.length },
-        (_, index) => window.localStorage.key(index)
-      ).filter((key): key is string => Boolean(key?.startsWith("lineme-ticket-")));
-      const savedTickets: Array<{ key: string; token: string }> = [];
-
-      for (const key of ticketKeys) {
-        try {
-          const stored = JSON.parse(
-            window.localStorage.getItem(key) ?? ""
-          ) as JoinedLineTicket;
-
-          if (stored.ticketToken) {
-            savedTickets.push({ key, token: stored.ticketToken });
-          } else {
-            window.localStorage.removeItem(key);
-          }
-        } catch {
-          window.localStorage.removeItem(key);
-        }
-      }
-
+    async function openInitialLine() {
       try {
-        const restoredResults = await Promise.all(
-          savedTickets.map(async ({ key, token }) => {
-            const restored = await fetchSavedTicket(token);
-
-            if (!restored) {
-              window.localStorage.removeItem(key);
-            }
-
-            return restored;
-          })
-        );
-        const restoredBrowserTickets = restoredResults.filter(
-          (item): item is SavedJoinedLine => Boolean(item)
-        );
-        const accountTickets = await fetchAccountTickets();
-        const restored = mergeSavedLines(
-          accountTickets,
-          restoredBrowserTickets
-        );
-
-        setSavedLines(restored);
-
         if (detailMode) {
           await findLine(initialCode, "share_link");
         }
-      } finally {
-        setLoadingSaved(false);
+      } catch {
+        // Opening a shared line is a convenience; direct search should still work.
       }
     }
 
-    void restoreSavedLines();
+    void openInitialLine();
     // The initial share-link code should be resolved only on first render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -396,18 +333,12 @@ export function JoinLineExperience({
         `lineme-ticket-${line.public_code}`,
         JSON.stringify(joinedTicket)
       );
-      setSavedLines((current) => [
-        { line, ticket: joinedTicket },
-        ...current.filter(
-          (item) => item.ticket.ticketToken !== joinedTicket.ticketToken
-        )
-      ]);
       trackEvent(MixpanelEvent.LineJoined, {
         join_method: lineDiscoveryMethod,
         line_id: line.id,
         line_type: line.line_type
       });
-      router.push(`/${locale}/tickets`);
+      router.replace(`/${locale}/tickets`);
     } catch {
       setJoinError(t("errors.join_failed"));
     } finally {
@@ -439,7 +370,15 @@ export function JoinLineExperience({
       `lineme-join-draft-${line.public_code}`,
       JSON.stringify({ answers, autoJoin: true })
     );
-    const nextPath = `/${locale}/join/${line.public_code}`;
+    window.localStorage.setItem(
+      pendingAccountJoinStorageKey,
+      JSON.stringify({
+        answers,
+        code: line.public_code,
+        discoveryMethod: lineDiscoveryMethod
+      })
+    );
+    const nextPath = `/${locale}/tickets`;
     router.push(`/${locale}/auth?next=${encodeURIComponent(nextPath)}`);
   }
 
@@ -510,12 +449,6 @@ export function JoinLineExperience({
 
       setLine(restored.line);
       setTicket(restored.ticket);
-      setSavedLines((current) => [
-        restored,
-        ...current.filter(
-          (item) => item.ticket.ticketToken !== restored.ticket.ticketToken
-        )
-      ]);
     } catch {
       setTicketError(t("errors.ticket_lookup"));
     } finally {
@@ -568,11 +501,6 @@ export function JoinLineExperience({
       }
 
       window.localStorage.removeItem(`lineme-ticket-${line.public_code}`);
-      setSavedLines((current) =>
-        current.filter(
-          (item) => item.ticket.ticketToken !== ticket.ticketToken
-        )
-      );
       setLine(null);
       setTicket(null);
       setCode("");
@@ -623,12 +551,6 @@ export function JoinLineExperience({
       if (restored) {
         setTicket(restored.ticket);
         setLine(restored.line);
-        setSavedLines((current) => [
-          restored,
-          ...current.filter(
-            (item) => item.ticket.ticketToken !== restored.ticket.ticketToken
-          )
-        ]);
       }
       trackEvent(MixpanelEvent.AdditionalInfoSubmitted, {
         line_id: line.id
@@ -651,52 +573,26 @@ export function JoinLineExperience({
       <div className={detailMode ? "hidden" : "grid content-start gap-5"}>
         <Link
           href={`/${locale}/tickets`}
-          className="rounded-[2rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500"
+          className="group rounded-[2rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500"
         >
-          <Surface className="p-4 transition hover:bg-white/85 sm:p-5 dark:hover:bg-white/15">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-base font-semibold text-slate-950 dark:text-white">
-                {t("saved.title")}
-              </h2>
-              <span className="shrink-0 text-xs font-semibold text-teal-700 dark:text-teal-200">
+          <Surface className="p-4 transition hover:border-teal-300/70 hover:bg-white/90 hover:shadow-lg hover:shadow-teal-900/5 sm:p-5 dark:hover:border-teal-300/30 dark:hover:bg-white/15">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-teal-500/10 text-teal-700 dark:bg-teal-300/10 dark:text-teal-200">
+                <TicketCheck aria-hidden="true" className="h-5 w-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-base font-semibold text-slate-950 dark:text-white">
+                  {t("saved.title")}
+                </span>
+                <span className="mt-1 block text-sm leading-6 text-slate-600 dark:text-slate-300">
+                  {t("saved.description")}
+                </span>
+              </span>
+              <span className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-teal-600 px-3.5 text-sm font-semibold text-white shadow-sm shadow-teal-900/15 transition group-hover:bg-teal-700 dark:bg-teal-500 dark:text-slate-950 dark:group-hover:bg-teal-300">
                 {t("saved.history")}
+                <ArrowRight aria-hidden="true" className="h-4 w-4" />
               </span>
             </div>
-            {savedLines[0] ? (
-              <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-slate-950/[0.035] px-4 py-3 dark:bg-white/[0.06]">
-              <span className="min-w-0">
-                <span className="block text-xs text-slate-500 dark:text-slate-400">
-                  {t("line.nameLabel")}
-                </span>
-                <span className="block truncate text-sm font-semibold text-slate-950 dark:text-white">
-                  {savedLines[0].line.name}
-                </span>
-                <span className="mt-1 block text-xs text-slate-500 dark:text-slate-400">
-                  {t("line.typeLabel")}:{" "}
-                  <span className="font-semibold text-slate-700 dark:text-slate-200">
-                    {savedLines[0].line.line_type === "other" &&
-                    savedLines[0].line.custom_line_type
-                      ? savedLines[0].line.custom_line_type
-                      : t(`line.types.${savedLines[0].line.line_type}`)}
-                  </span>
-                </span>
-                <span className="mt-0.5 block text-xs text-slate-500 dark:text-slate-400">
-                  {t(
-                    `success.status.${savedLines[0].ticket.status ?? "waiting"}`
-                  )}{" "}
-                  · {t("success.position")} {savedLines[0].ticket.positionNumber}
-                </span>
-              </span>
-                <TicketCheck
-                  aria-hidden="true"
-                  className="h-4 w-4 shrink-0 text-teal-600 dark:text-teal-300"
-                />
-              </div>
-            ) : (
-              <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
-                {loadingSaved ? t("saved.loading") : t("saved.none")}
-              </p>
-            )}
           </Surface>
         </Link>
 
@@ -880,6 +776,10 @@ export function JoinLineExperience({
             ) : ticket.status === "cancelled" ? (
               <p className="mx-auto mt-5 max-w-md rounded-2xl bg-slate-500/10 px-4 py-3 text-sm font-medium leading-6 text-slate-700 dark:text-slate-300">
                 {t("success.cancelledInfo")}
+              </p>
+            ) : ticket.status === "no_show" ? (
+              <p className="mx-auto mt-5 max-w-md rounded-2xl bg-orange-500/10 px-4 py-3 text-sm font-medium leading-6 text-orange-800 dark:text-orange-200">
+                {t("success.noShowInfo")}
               </p>
             ) : (
               <p className="mx-auto mt-5 max-w-md text-sm leading-6 text-slate-600 dark:text-slate-300">

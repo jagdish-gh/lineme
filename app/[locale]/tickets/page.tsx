@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
+import { PendingAccountJoin } from "@/components/tickets/pending-account-join";
 import { TicketHistory } from "@/components/tickets/ticket-history";
 import { PageEyebrow } from "@/components/ui/page-eyebrow";
 import { locales, type Locale } from "@/i18n/routing";
@@ -84,6 +85,7 @@ export default async function TicketsPage({ params }: TicketsPageProps) {
         </div>
 
         <div className="mt-8">
+          <PendingAccountJoin />
           {accountTickets?.error ? (
             <p
               role="alert"
