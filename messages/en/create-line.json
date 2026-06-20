@@ -21,7 +21,15 @@
       "customerDescription": "Share this public join page with your customers so they can join the line.",
       "customerLink": "Open customer join page",
       "manageDescription": "Use this private management page to call, serve, pause, or close the line.",
-      "manageLink": "Manage this line"
+      "manageLink": "Manage this line",
+      "qr": {
+        "title": "Print a join QR code",
+        "description": "Put this at your counter, entrance, table, or notice board. Visitors can scan it with their phone camera and join directly.",
+        "posterSubtitle": "Scan this QR code with your phone camera to join the line.",
+        "posterFooter": "Powered by LineME. No app install required.",
+        "print": "Print QR poster",
+        "download": "Download QR"
+      }
     },
     "errors": {
       "authentication_required": "Your session expired. Please sign in again.",

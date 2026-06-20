@@ -18,6 +18,7 @@
     "shareLink": "जुड़ने का लिंक साझा करें",
     "linkCopied": "लिंक कॉपी हो गया",
     "shareText": "LineME पर {name} में जुड़ें।",
+    "qrLabel": "{name} में जुड़ने के लिए QR कोड",
     "manageQueue": "इस कतार को संभालें",
     "serviceTime": "सेवा समय",
     "dailyCapacity": "दैनिक क्षमता",

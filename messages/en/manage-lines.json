@@ -18,6 +18,7 @@
     "shareLink": "Share join link",
     "linkCopied": "Link copied",
     "shareText": "Join {name} on LineME.",
+    "qrLabel": "QR code to join {name}",
     "manageQueue": "Manage this queue",
     "serviceTime": "Service time",
     "dailyCapacity": "Daily capacity",

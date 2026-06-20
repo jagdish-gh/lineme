@@ -8,6 +8,7 @@ import {
   type ManagedEntry
 } from "@/components/manage-lines/line-manager";
 import { CopyLineCodeButton } from "@/components/manage-lines/copy-line-code-button";
+import { LineJoinQrCard } from "@/components/manage-lines/line-join-qr-card";
 import { PageEyebrow } from "@/components/ui/page-eyebrow";
 import { Surface } from "@/components/ui/surface";
 import { locales, type Locale } from "@/i18n/routing";
@@ -139,6 +140,18 @@ export default async function ManageLinePage({
             ) : null}
           </dl>
         </Surface>
+        <LineJoinQrCard
+          code={line.public_code}
+          description={t("qr.description")}
+          downloadLabel={t("qr.download")}
+          lineCodeLabel={t("lineCode")}
+          lineName={line.name}
+          locale={locale}
+          posterFooter={t("qr.posterFooter")}
+          posterSubtitle={t("qr.posterSubtitle")}
+          printLabel={t("qr.print")}
+          title={t("qr.title")}
+        />
         <div className="mt-8">
           <LineManager
             allowPause={line.allow_pause}

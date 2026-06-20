@@ -20,6 +20,14 @@
       "paused": "Paused",
       "closed": "Closed"
     },
+    "qr": {
+      "title": "Share this line with a QR code",
+      "description": "Print this poster for your counter, entrance, table, or notice board. Visitors can scan it with their phone camera and join directly.",
+      "posterSubtitle": "Scan this QR code with your phone camera to join the line.",
+      "posterFooter": "Powered by LineME. No app install required.",
+      "print": "Print QR poster",
+      "download": "Download QR"
+    },
     "summary": {
       "active": "Active members",
       "called": "Currently called",

@@ -144,11 +144,18 @@ export function CreateLineForm() {
                     customerDescription={t("success.customerDescription")}
                     customerLinkLabel={t("success.customerLink")}
                     description={t("success.description")}
+                    downloadQrLabel={t("success.qr.download")}
                     lineId={createdLine.id}
                     lineCodeLabel={t("success.codeLabel")}
+                    lineName={form.lineName}
                     locale={locale}
                     manageDescription={t("success.manageDescription")}
                     manageLinkLabel={t("success.manageLink")}
+                    printQrLabel={t("success.qr.print")}
+                    qrDescription={t("success.qr.description")}
+                    qrPosterFooter={t("success.qr.posterFooter")}
+                    qrPosterSubtitle={t("success.qr.posterSubtitle")}
+                    qrTitle={t("success.qr.title")}
                     title={t("success.title")}
                   />
                 ) : (

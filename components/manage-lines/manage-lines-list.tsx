@@ -11,6 +11,7 @@ import { getFormatter, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { CopyLineCodeButton } from "@/components/manage-lines/copy-line-code-button";
+import { LineCardQr } from "@/components/manage-lines/line-card-qr";
 import { ShareLineButton } from "@/components/manage-lines/share-line-button";
 import { Surface } from "@/components/ui/surface";
 
@@ -95,6 +96,11 @@ export async function ManageLinesList({ lines, locale }: ManageLinesListProps) {
                   </p>
                 ) : null}
               </div>
+              <LineCardQr
+                code={line.public_code}
+                label={t("qrLabel", { name: line.name })}
+                locale={locale}
+              />
             </div>
 
             <div className="mt-5 rounded-2xl border border-slate-950/10 bg-white/65 p-3 dark:border-white/10 dark:bg-slate-950/25">
