@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+import {
+  sendTicketPush,
+  type TicketPushPayload
+} from "@/lib/push/server";
 import { supabaseConfig } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -8,6 +12,59 @@ const actions = new Set(["call", "call_next", "no_show", "serve"]);
 type LineEntryNotificationTarget = {
   id: string;
   ticket_token: string;
+};
+
+type PushSubscriptionRecord = {
+  auth: string;
+  endpoint: string;
+  id: string;
+  locale: "en" | "hi";
+  notifications_sent: string[];
+  p256dh: string;
+};
+
+type ActiveEntryWithPush = {
+  id: string;
+  line_id: string;
+  lines: {
+    name: string;
+    public_code: string;
+  };
+  position_number: number;
+  status: "called" | "waiting";
+  ticket_push_subscriptions: PushSubscriptionRecord[];
+  ticket_token: string;
+};
+
+const milestoneMessages = {
+  en: {
+    ahead2: (lineName: string) => ({
+      body: "Only 2 people are ahead of you. Please stay nearby.",
+      title: `${lineName}: you are almost up`
+    }),
+    ahead3: (lineName: string) => ({
+      body: "Only 3 people are ahead of you. Get ready for your turn.",
+      title: `${lineName}: your turn is close`
+    }),
+    turn: (lineName: string) => ({
+      body: "It is your turn now. Please head to the service area.",
+      title: `${lineName}: it is your turn`
+    })
+  },
+  hi: {
+    ahead2: (lineName: string) => ({
+      body: "आपसे आगे सिर्फ 2 लोग हैं। कृपया पास में रहें।",
+      title: `${lineName}: आपकी बारी लगभग आ गई है`
+    }),
+    ahead3: (lineName: string) => ({
+      body: "आपसे आगे सिर्फ 3 लोग हैं। अपनी बारी के लिए तैयार रहें।",
+      title: `${lineName}: आपकी बारी नजदीक है`
+    }),
+    turn: (lineName: string) => ({
+      body: "अब आपकी बारी है। कृपया सेवा क्षेत्र में जाएं।",
+      title: `${lineName}: आपकी बारी है`
+    })
+  }
 };
 
 async function broadcastTicketRefreshes(
@@ -47,6 +104,113 @@ async function broadcastTicketRefreshes(
     }
   } catch (error) {
     console.error("Failed to broadcast ticket refreshes", error);
+  }
+}
+
+function getMilestone(entry: ActiveEntryWithPush, peopleAhead: number) {
+  if (entry.status === "called") {
+    return "turn";
+  }
+
+  if (peopleAhead === 3) {
+    return "ahead3";
+  }
+
+  if (peopleAhead === 2) {
+    return "ahead2";
+  }
+
+  return null;
+}
+
+async function sendQueueMilestonePushes(
+  supabase: NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>,
+  lineId: string,
+  requestUrl: string
+) {
+  const { data, error } = await supabase
+    .from("line_entries")
+    .select(
+      "id, line_id, position_number, status, ticket_token, lines!inner(name, public_code), ticket_push_subscriptions(id, endpoint, p256dh, auth, locale, notifications_sent)"
+    )
+    .eq("line_id", lineId)
+    .in("status", ["waiting", "called"])
+    .order("position_number");
+
+  if (error) {
+    console.error("Failed to load push notification targets", error);
+    return;
+  }
+
+  const entries = (data ?? []) as unknown as ActiveEntryWithPush[];
+  const origin = new URL(requestUrl).origin;
+
+  for (const [index, entry] of entries.entries()) {
+    const peopleAhead = index;
+    const milestone = getMilestone(entry, peopleAhead);
+
+    if (!milestone) {
+      continue;
+    }
+
+    for (const subscription of entry.ticket_push_subscriptions ?? []) {
+      if (subscription.notifications_sent.includes(milestone)) {
+        continue;
+      }
+
+      const locale = subscription.locale === "hi" ? "hi" : "en";
+      const message = milestoneMessages[locale][milestone](entry.lines.name);
+      const payload: TicketPushPayload = {
+        body: message.body,
+        tag: `lineme:${entry.id}:${milestone}`,
+        title: message.title,
+        url: `${origin}/${locale}/tickets`
+      };
+
+      try {
+        const result = await sendTicketPush(
+          {
+            endpoint: subscription.endpoint,
+            keys: {
+              auth: subscription.auth,
+              p256dh: subscription.p256dh
+            }
+          },
+          payload
+        );
+
+        if (!result.skipped) {
+          await supabase
+            .from("ticket_push_subscriptions")
+            .update({
+              notifications_sent: [
+                ...new Set([
+                  ...subscription.notifications_sent,
+                  milestone
+                ])
+              ]
+            })
+            .eq("id", subscription.id);
+        }
+      } catch (error) {
+        const statusCode =
+          typeof error === "object" &&
+          error &&
+          "statusCode" in error &&
+          typeof error.statusCode === "number"
+            ? error.statusCode
+            : null;
+
+        if (statusCode === 404 || statusCode === 410) {
+          await supabase
+            .from("ticket_push_subscriptions")
+            .delete()
+            .eq("id", subscription.id);
+        } else {
+          console.error("Failed to send push notification", error);
+        }
+      }
+    }
   }
 }
 
@@ -135,6 +299,7 @@ export async function POST(
       [...(activeEntries ?? []), noShowEntry],
       lineId
     );
+    await sendQueueMilestonePushes(supabase, lineId, request.url);
 
     return NextResponse.json({ entryId: noShowEntry.id });
   }
@@ -185,6 +350,7 @@ export async function POST(
     [...(activeEntries ?? []), ...(affectedEntries ?? [])],
     lineId
   );
+  await sendQueueMilestonePushes(supabase, lineId, request.url);
 
   return NextResponse.json({ entryId: data });
 }

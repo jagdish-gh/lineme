@@ -12,6 +12,7 @@ import {
   type JoinedLineTicket,
   type PublicLine
 } from "@/lib/lines/public-line";
+import { queuePushPrompt } from "@/lib/push/client";
 
 export const pendingAccountJoinStorageKey = "lineme-pending-account-join";
 
@@ -181,6 +182,10 @@ export function PendingAccountJoin() {
           `lineme-ticket-${lineResult.line.public_code}`,
           JSON.stringify(joinedTicket)
         );
+        queuePushPrompt({
+          lineName: lineResult.line.name,
+          ticketToken: joinedTicket.ticketToken
+        });
         trackEvent(MixpanelEvent.LineJoined, {
           join_method: pendingJoin.discoveryMethod,
           line_id: lineResult.line.id,

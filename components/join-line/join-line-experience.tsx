@@ -37,6 +37,7 @@ import {
   type SavedJoinedLine
 } from "@/lib/lines/public-line";
 import { MixpanelEvent, trackEvent } from "@/lib/analytics/mixpanel";
+import { queuePushPrompt } from "@/lib/push/client";
 
 type JoinLineExperienceProps = {
   initialCode?: string;
@@ -333,6 +334,10 @@ export function JoinLineExperience({
         `lineme-ticket-${line.public_code}`,
         JSON.stringify(joinedTicket)
       );
+      queuePushPrompt({
+        lineName: line.name,
+        ticketToken: joinedTicket.ticketToken
+      });
       trackEvent(MixpanelEvent.LineJoined, {
         join_method: lineDiscoveryMethod,
         line_id: line.id,

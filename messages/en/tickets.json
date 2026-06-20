@@ -73,6 +73,15 @@
       "dismiss": "Dismiss notification",
       "dismissShort": "Dismiss"
     },
+    "pushPrompt": {
+      "title": "Get turn alerts",
+      "description": "Enable notifications for {name}. We will alert you when 3 people are ahead, 2 people are ahead, and when it is your turn.",
+      "enable": "Enable alerts",
+      "enabling": "Enabling...",
+      "notNow": "Not now",
+      "dismiss": "Dismiss notification prompt",
+      "error": "Push notifications could not be enabled on this browser. You can still check your ticket here."
+    },
     "empty": {
       "title": "No tickets in this filter",
       "description": "Your ticket history will appear here after you join a queue."

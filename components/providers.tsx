@@ -7,6 +7,7 @@ import {
   AuthCodeRedirect,
   PendingAccountJoinRedirect
 } from "@/components/tickets/pending-account-join";
+import { PushNotificationPrompt } from "@/components/tickets/push-notification-prompt";
 import { TicketTurnNotifier } from "@/components/tickets/ticket-turn-notifier";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -21,6 +22,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <MixpanelIdentity />
       <AuthCodeRedirect />
       <PendingAccountJoinRedirect />
+      <PushNotificationPrompt />
       <TicketTurnNotifier />
       {children}
     </ThemeProvider>
