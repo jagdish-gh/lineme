@@ -25,6 +25,11 @@ import { ActionButton } from "@/components/ui/action-button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Surface } from "@/components/ui/surface";
 import { MixpanelEvent, trackEvent } from "@/lib/analytics/mixpanel";
+import {
+  getCalledLineEntry,
+  getVisibleLineEntries,
+  isActiveLineEntry
+} from "@/lib/lines/manage-line";
 
 type Question = { id: string; label: string; position: number };
 type Request = {
@@ -86,17 +91,9 @@ export function LineManager({
     [questions]
   );
   const entryIds = useMemo(() => entries.map((entry) => entry.id), [entries]);
-  const activeEntries = entries.filter((entry) =>
-    ["waiting", "called"].includes(entry.status)
-  );
-  const noShowEntries = entries.filter((entry) => entry.status === "no_show");
-  const visibleEntries =
-    filter === "active"
-      ? activeEntries
-      : filter === "no_show"
-        ? noShowEntries
-      : entries;
-  const calledEntry = entries.find((entry) => entry.status === "called");
+  const activeEntries = entries.filter(isActiveLineEntry);
+  const visibleEntries = getVisibleLineEntries(entries, filter);
+  const calledEntry = getCalledLineEntry(entries);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -236,12 +233,17 @@ export function LineManager({
 
   return (
     <>
-      <Surface className="mb-6 p-5 sm:p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-950 dark:text-white">
-              {t("intake.title")}
-            </h2>
+      <Surface className="mb-5 p-4 sm:p-5">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-base font-semibold text-slate-950 dark:text-white">
+                {t("intake.title")}
+              </h2>
+              <span className="rounded-full bg-slate-950/[0.04] px-2.5 py-1 text-xs font-semibold text-slate-600 dark:bg-white/[0.07] dark:text-slate-300">
+                {activeEntries.length} {t("summary.active")}
+              </span>
+            </div>
             <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
               {lineStatus === "closed"
                 ? t("intake.closed")
@@ -257,6 +259,52 @@ export function LineManager({
                     : t("intake.active")}
             </p>
           </div>
+
+          <ActionButton
+            type="button"
+            className="w-full lg:min-w-48"
+            disabled={Boolean(busyAction)}
+            onClick={() => void runAction("call_next")}
+          >
+            {busyAction === "call_next:next" ? (
+              <LoaderCircle className="h-4 w-4 animate-spin" />
+            ) : (
+              <Megaphone className="h-4 w-4" />
+            )}
+            {t("callNext")}
+          </ActionButton>
+        </div>
+
+        <div className="mt-4 grid gap-3 border-t border-slate-950/5 pt-4 dark:border-white/10">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="flex min-w-0 items-center gap-4 rounded-2xl bg-slate-950/[0.035] px-4 py-3 dark:bg-white/[0.06]">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-teal-500/10 text-teal-700 dark:bg-teal-300/10 dark:text-teal-200">
+                <UsersRound className="h-5 w-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                  {t("summary.active")}
+                </p>
+                <p className="mt-0.5 text-2xl font-bold leading-none text-slate-950 dark:text-white">
+                  {activeEntries.length}
+                </p>
+              </div>
+            </div>
+            <div className="flex min-w-0 items-center gap-4 rounded-2xl bg-slate-950/[0.035] px-4 py-3 dark:bg-white/[0.06]">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-500/10 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200">
+                <Megaphone className="h-5 w-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                  {t("summary.called")}
+                </p>
+                <p className="mt-0.5 truncate text-xl font-bold leading-tight text-slate-950 dark:text-white">
+                  {calledEntry ? memberLabel(calledEntry) : t("summary.none")}
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             {lineStatus === "paused" ? (
               <ActionButton
@@ -308,32 +356,6 @@ export function LineManager({
           </div>
         </div>
       </Surface>
-
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Surface className="p-5">
-          <UsersRound className="h-5 w-5 text-teal-600 dark:text-teal-300" />
-          <p className="mt-3 text-3xl font-bold text-slate-950 dark:text-white">{activeEntries.length}</p>
-          <p className="text-sm text-slate-600 dark:text-slate-300">{t("summary.active")}</p>
-        </Surface>
-        <Surface className="p-5">
-          <Megaphone className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />
-          <p className="mt-3 truncate text-lg font-bold text-slate-950 dark:text-white">
-            {calledEntry ? memberLabel(calledEntry) : t("summary.none")}
-          </p>
-          <p className="text-sm text-slate-600 dark:text-slate-300">{t("summary.called")}</p>
-        </Surface>
-        <Surface className="flex items-center p-5">
-          <ActionButton
-            type="button"
-            className="w-full"
-            disabled={Boolean(busyAction)}
-            onClick={() => void runAction("call_next")}
-          >
-            {busyAction === "call_next:next" ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Megaphone className="h-4 w-4" />}
-            {t("callNext")}
-          </ActionButton>
-        </Surface>
-      </div>
 
       {error ? <p role="alert" className="mt-4 rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 dark:bg-rose-400/10 dark:text-rose-200">{error}</p> : null}
 

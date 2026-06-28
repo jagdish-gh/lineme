@@ -2,7 +2,7 @@
   "createLine": {
     "metadata": {
       "title": "Create a Line - LineME",
-      "description": "Create a digital queue with live capacity, wait time, and notification settings."
+      "description": "Create a digital queue with live status and notification settings."
     },
     "back": "Back home",
     "eyebrow": "Create a digital line",
@@ -36,16 +36,14 @@
       "configuration": "Line creation is not configured yet.",
       "create_failed": "We could not create the line. Please try again.",
       "database_not_ready": "Line creation is being configured. The database migration still needs to be applied.",
-      "invalid_capacity": "Daily capacity must be between 5 and 250.",
+      "invalid_capacity": "Check the line details and try again.",
       "invalid_custom_type": "Enter a line type between 2 and 80 characters.",
-      "invalid_estimate": "Average service time must be between 2 and 60 minutes.",
+      "invalid_estimate": "Check the line details and try again.",
       "invalid_line_name": "Enter a line name between 2 and 100 characters.",
       "invalid_location": "Location must be 160 characters or fewer.",
       "invalid_questions": "Check the visitor questions. Multiple-choice questions need at least two options.",
       "invalid_request": "Check the line details and try again."
     },
-    "minutes": "min",
-    "people": "people",
     "defaults": {
       "lineName": "",
       "location": ""
@@ -53,7 +51,7 @@
     "sections": {
       "details": {
         "title": "Line details",
-        "description": "Help visitors recognize the correct line and set realistic service expectations."
+        "description": "Help visitors recognize the correct line before they join."
       }
     },
     "fields": {
@@ -61,20 +59,17 @@
       "location": "Location or counter (optional)",
       "queueType": "Line type",
       "customQueueType": "Describe your line type",
-      "estimatedMinutes": "Average service time (optional)",
-      "capacity": "Daily capacity (optional)",
       "autoNotify": "Notify people automatically",
       "allowPause": "Allow pausing intake"
     },
     "placeholders": {
       "lineName": "Example: General consultation",
       "location": "Example: First floor, Counter 4",
-      "customQueueType": "Example: Document collection",
-      "optionalNumber": "Leave blank"
+      "customQueueType": "Example: Document collection"
     },
     "advanced": {
       "title": "Advanced settings",
-      "description": "Wait time, capacity, notifications, and intake controls"
+      "description": "Notifications and intake controls"
     },
     "types": {
       "clinic": "Clinic",
@@ -125,7 +120,11 @@
         },
         "advanced": {
           "question": "Do I need to complete Advanced settings?",
-          "answer": "No. Average service time and daily capacity are optional and can be left blank. Notification and intake controls already have sensible defaults and can be changed later."
+          "answer": "No. Notification and intake controls already have sensible defaults and can be changed later."
+        },
+        "qrCode": {
+          "question": "Where do I download the QR code of the line?",
+          "answer": "After you create the line, use the success screen or the Manage queues page to download or print the QR poster. You can place it at your counter, entrance, or table so visitors can scan and join the same line code."
         },
         "questions": {
           "question": "What should I ask visitors?",

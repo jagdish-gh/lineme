@@ -1,19 +1,31 @@
 "use client";
 
-import { Download, Printer, QrCode } from "lucide-react";
+import { ChevronDown, Download, MapPin, Printer, QrCode } from "lucide-react";
 import Image from "next/image";
 import QRCode from "qrcode";
 import { useEffect, useMemo, useState } from "react";
 
+import { CopyLineCodeButton } from "@/components/manage-lines/copy-line-code-button";
 import { ActionButton } from "@/components/ui/action-button";
 import { Surface } from "@/components/ui/surface";
+import { cn } from "@/lib/utils";
 
 type LineJoinQrCardProps = {
+  className?: string;
   code: string;
+  copiedLabel: string;
+  copyLabel: string;
   description: string;
   downloadLabel: string;
   lineCodeLabel: string;
+  lineNameLabel: string;
   lineName: string;
+  lineStatus: "active" | "closed" | "paused";
+  lineStatusLabel: string;
+  lineType: string;
+  lineTypeLabel: string;
+  location: string | null;
+  locationLabel: string;
   locale: string;
   posterFooter: string;
   posterSubtitle: string;
@@ -30,11 +42,21 @@ function escapeHtml(value: string) {
 }
 
 export function LineJoinQrCard({
+  className,
   code,
+  copiedLabel,
+  copyLabel,
   description,
   downloadLabel,
   lineCodeLabel,
+  lineNameLabel,
   lineName,
+  lineStatus,
+  lineStatusLabel,
+  lineType,
+  lineTypeLabel,
+  location,
+  locationLabel,
   locale,
   posterFooter,
   posterSubtitle,
@@ -42,6 +64,7 @@ export function LineJoinQrCard({
   title
 }: LineJoinQrCardProps) {
   const [origin, setOrigin] = useState("");
+  const [expanded, setExpanded] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const joinPath = `/${locale}/join/${code}`;
   const joinUrl = useMemo(
@@ -51,6 +74,16 @@ export function LineJoinQrCard({
 
   useEffect(() => {
     setOrigin(window.location.origin);
+  }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+    const syncExpanded = () => setExpanded(mediaQuery.matches);
+
+    syncExpanded();
+    mediaQuery.addEventListener("change", syncExpanded);
+
+    return () => mediaQuery.removeEventListener("change", syncExpanded);
   }, []);
 
   useEffect(() => {
@@ -203,60 +236,149 @@ export function LineJoinQrCard({
   }
 
   return (
-    <Surface className="mt-5 p-5 sm:p-6">
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-        <div className="min-w-0">
-          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-teal-500/10 text-teal-700 dark:bg-teal-300/10 dark:text-teal-200">
-            <QrCode aria-hidden="true" className="h-5 w-5" />
+    <Surface className={cn("overflow-hidden", className)}>
+      <button
+        type="button"
+        aria-expanded={expanded}
+        onClick={() => setExpanded((current) => !current)}
+        className="flex w-full items-start justify-between gap-4 p-5 text-left transition hover:bg-white/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-teal-500 sm:p-6 dark:hover:bg-white/5"
+      >
+        <span className="min-w-0">
+          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
+            {lineNameLabel}
           </span>
-          <h2 className="mt-4 text-lg font-semibold text-slate-950 dark:text-white">
-            {title}
-          </h2>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
-            {description}
-          </p>
-          <p className="mt-3 break-all rounded-xl bg-slate-950/[0.035] px-3 py-2 text-xs font-semibold text-slate-600 dark:bg-white/[0.06] dark:text-slate-300">
-            {joinUrl}
-          </p>
-          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-            <ActionButton
-              disabled={!qrCodeUrl}
-              icon={Printer}
-              onClick={printQrPoster}
-              size="small"
-              type="button"
+          <span className="mt-1 block break-words text-2xl font-semibold text-slate-950 dark:text-white sm:text-3xl">
+            {lineName}
+          </span>
+          <span className="mt-3 flex flex-wrap items-center gap-2">
+            <span
+              className={`w-fit shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold ${
+                lineStatus === "active"
+                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-200"
+                  : lineStatus === "paused"
+                    ? "bg-amber-500/10 text-amber-700 dark:text-amber-200"
+                    : "bg-slate-500/10 text-slate-600 dark:text-slate-300"
+              }`}
             >
-              {printLabel}
-            </ActionButton>
-            <ActionButton
+              {lineStatusLabel}
+            </span>
+            <span className="font-mono text-sm font-bold tracking-[0.1em] text-slate-700 dark:text-slate-200">
+              {code}
+            </span>
+          </span>
+        </span>
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-950/[0.035] text-slate-500 dark:bg-white/[0.06] dark:text-slate-300">
+          <ChevronDown
+            aria-hidden="true"
+            className={`h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`}
+          />
+        </span>
+      </button>
+
+      {expanded ? (
+        <div className="border-t border-slate-950/5 p-5 pt-5 sm:p-6 dark:border-white/10">
+          <dl className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl bg-slate-950/[0.035] p-4 dark:bg-white/[0.06]">
+              <dt className="text-xs text-slate-500 dark:text-slate-400">
+                {lineTypeLabel}
+              </dt>
+              <dd className="mt-1 font-semibold text-slate-900 dark:text-white">
+                {lineType}
+              </dd>
+            </div>
+            <div className="rounded-2xl bg-slate-950/[0.035] p-4 dark:bg-white/[0.06]">
+              <dt className="text-xs text-slate-500 dark:text-slate-400">
+                {lineCodeLabel}
+              </dt>
+              <dd className="mt-2 flex flex-wrap items-center justify-between gap-3">
+                <span className="select-all font-mono text-base font-bold tracking-[0.1em] text-slate-900 dark:text-white">
+                  {code}
+                </span>
+                <CopyLineCodeButton
+                  code={code}
+                  copiedLabel={copiedLabel}
+                  copyLabel={copyLabel}
+                />
+              </dd>
+            </div>
+            {location ? (
+              <div className="rounded-2xl bg-slate-950/[0.035] p-4 sm:col-span-2 dark:bg-white/[0.06]">
+                <dt className="text-xs text-slate-500 dark:text-slate-400">
+                  {locationLabel}
+                </dt>
+                <dd className="mt-1 flex items-start gap-2 font-semibold text-slate-900 dark:text-white">
+                  <MapPin
+                    aria-hidden="true"
+                    className="mt-0.5 h-4 w-4 shrink-0 text-teal-600 dark:text-teal-300"
+                  />
+                  {location}
+                </dd>
+              </div>
+            ) : null}
+          </dl>
+
+          <div className="mt-5 grid gap-5 border-t border-slate-950/5 pt-5 dark:border-white/10">
+            <div className="min-w-0">
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal-500/10 text-teal-700 dark:bg-teal-300/10 dark:text-teal-200">
+                <QrCode aria-hidden="true" className="h-5 w-5" />
+              </span>
+              <h2 className="mt-4 text-lg font-semibold text-slate-950 dark:text-white">
+                {title}
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+                {description}
+              </p>
+              <p className="mt-3 break-all rounded-xl bg-slate-950/[0.035] px-3 py-2 text-xs font-semibold text-slate-600 dark:bg-white/[0.06] dark:text-slate-300">
+                {joinUrl}
+              </p>
+              <div className="mt-4 grid gap-2">
+                <ActionButton
+                  disabled={!qrCodeUrl}
+                  icon={Printer}
+                  onClick={printQrPoster}
+                  size="small"
+                  type="button"
+                >
+                  {printLabel}
+                </ActionButton>
+                <ActionButton
+                  disabled={!qrCodeUrl}
+                  icon={Download}
+                  onClick={downloadQrCode}
+                  size="small"
+                  type="button"
+                  variant="secondary"
+                >
+                  {downloadLabel}
+                </ActionButton>
+              </div>
+            </div>
+            <button
+              type="button"
+              aria-label={downloadLabel}
               disabled={!qrCodeUrl}
-              icon={Download}
               onClick={downloadQrCode}
-              size="small"
-              type="button"
-              variant="secondary"
+              className="grid place-items-center justify-self-center rounded-2xl bg-white p-3 shadow-sm transition hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-wait dark:bg-white"
+              title={downloadLabel}
             >
-              {downloadLabel}
-            </ActionButton>
+              {qrCodeUrl ? (
+                <Image
+                  alt=""
+                  className="h-44 w-44 sm:h-52 sm:w-52 lg:h-44 lg:w-44"
+                  height={176}
+                  src={qrCodeUrl}
+                  unoptimized
+                  width={176}
+                />
+              ) : (
+                <div className="grid h-44 w-44 place-items-center rounded-xl bg-slate-100 text-slate-400 sm:h-52 sm:w-52 lg:h-44 lg:w-44">
+                  <QrCode aria-hidden="true" className="h-10 w-10" />
+                </div>
+              )}
+            </button>
           </div>
         </div>
-        <div className="grid place-items-center rounded-2xl bg-white p-3 shadow-sm dark:bg-white">
-          {qrCodeUrl ? (
-            <Image
-              alt=""
-              className="h-52 w-52"
-              height={208}
-              src={qrCodeUrl}
-              unoptimized
-              width={208}
-            />
-          ) : (
-            <div className="grid h-52 w-52 place-items-center rounded-xl bg-slate-100 text-slate-400">
-              <QrCode aria-hidden="true" className="h-10 w-10" />
-            </div>
-          )}
-        </div>
-      </div>
+      ) : null}
     </Surface>
   );
 }

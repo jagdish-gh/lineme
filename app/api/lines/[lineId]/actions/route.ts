@@ -253,6 +253,17 @@ export async function POST(
     return NextResponse.json({ code: "invalid_action" }, { status: 400 });
   }
 
+  const { error: rolloverError } = await supabase.rpc(
+    "rollover_owned_line_day",
+    {
+      p_line_id: lineId
+    }
+  );
+
+  if (rolloverError) {
+    console.error("Failed to roll over line day", rolloverError);
+  }
+
   const { data: previouslyCalledEntries } = await supabase
     .from("line_entries")
     .select("id, ticket_token")

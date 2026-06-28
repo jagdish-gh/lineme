@@ -108,7 +108,7 @@ export default async function ManageLinesPage({
   const { data, error } = await supabase
     .from("lines")
     .select(
-      "id, name, location, line_type, custom_line_type, estimated_service_minutes, daily_capacity, auto_notify, allow_pause, status, paused_until, public_code, created_at"
+      "id, name, location, line_type, custom_line_type, auto_notify, allow_pause, status, paused_until, public_code, created_at"
     )
     .order("created_at", { ascending: false });
 

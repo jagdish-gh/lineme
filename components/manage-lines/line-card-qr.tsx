@@ -50,11 +50,25 @@ export function LineCardQr({ code, label, locale }: LineCardQrProps) {
     };
   }, [joinUrl]);
 
+  function downloadQrCode() {
+    if (!qrCodeUrl) {
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.download = `lineme-${code}-qr.png`;
+    link.href = qrCodeUrl;
+    link.click();
+  }
+
   return (
-    <div
+    <button
       aria-label={label}
-      className="grid h-20 w-20 shrink-0 place-items-center rounded-2xl border border-slate-950/10 bg-white p-1.5 shadow-sm dark:border-white/10 dark:bg-white"
+      className="grid h-20 w-20 shrink-0 place-items-center rounded-2xl border border-slate-950/10 bg-white p-1.5 shadow-sm transition hover:border-teal-300 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-wait dark:border-white/10 dark:bg-white"
+      disabled={!qrCodeUrl}
+      onClick={downloadQrCode}
       title={label}
+      type="button"
     >
       {qrCodeUrl ? (
         <Image
@@ -68,6 +82,6 @@ export function LineCardQr({ code, label, locale }: LineCardQrProps) {
       ) : (
         <QrCode aria-hidden="true" className="h-7 w-7 text-slate-400" />
       )}
-    </div>
+    </button>
   );
 }

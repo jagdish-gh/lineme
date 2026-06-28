@@ -5,7 +5,6 @@ import {
   ArrowRight,
   Check,
   CheckCircle2,
-  Clock3,
   Copy,
   LoaderCircle,
   MapPin,
@@ -891,7 +890,7 @@ export function JoinLineExperience({
                   {line.location}
                 </p>
               ) : null}
-              <div className="mt-5 grid grid-cols-2 gap-3">
+              <div className="mt-5 grid gap-3">
                 <div className="flex gap-2 rounded-2xl bg-slate-950/[0.035] p-3 dark:bg-white/[0.06]">
                   <UsersRound
                     aria-hidden="true"
@@ -903,24 +902,6 @@ export function JoinLineExperience({
                     </p>
                     <p className="mt-1 font-semibold text-slate-900 dark:text-white">
                       {t("line.people", { count: line.waiting_count })}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-2 rounded-2xl bg-slate-950/[0.035] p-3 dark:bg-white/[0.06]">
-                  <Clock3
-                    aria-hidden="true"
-                    className="mt-0.5 h-4 w-4 text-teal-600 dark:text-teal-300"
-                  />
-                  <div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {t("line.estimated")}
-                    </p>
-                    <p className="mt-1 font-semibold text-slate-900 dark:text-white">
-                      {line.estimated_service_minutes
-                        ? t("line.minutes", {
-                            count: line.estimated_service_minutes
-                          })
-                        : t("line.notAvailable")}
                     </p>
                   </div>
                 </div>

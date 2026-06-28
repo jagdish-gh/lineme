@@ -1,4 +1,4 @@
-import { ArrowLeft, MapPin, RefreshCw } from "lucide-react";
+import { ArrowLeft, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
@@ -7,11 +7,10 @@ import {
   LineManager,
   type ManagedEntry
 } from "@/components/manage-lines/line-manager";
-import { CopyLineCodeButton } from "@/components/manage-lines/copy-line-code-button";
 import { LineJoinQrCard } from "@/components/manage-lines/line-join-qr-card";
 import { PageEyebrow } from "@/components/ui/page-eyebrow";
-import { Surface } from "@/components/ui/surface";
 import { locales, type Locale } from "@/i18n/routing";
+import { getEffectiveLineStatus } from "@/lib/lines/manage-line";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -39,12 +38,22 @@ export default async function ManageLinePage({
     .eq("id", lineId)
     .maybeSingle();
   if (!line) notFound();
-  const effectiveStatus =
-    line.status === "paused" &&
-    line.paused_until &&
-    new Date(line.paused_until).getTime() <= Date.now()
-      ? "active"
-      : line.status;
+
+  const { error: rolloverError } = await supabase.rpc(
+    "rollover_owned_line_day",
+    {
+      p_line_id: lineId
+    }
+  );
+
+  if (rolloverError) {
+    console.error("Failed to roll over line day", rolloverError);
+  }
+
+  const effectiveStatus = getEffectiveLineStatus(
+    line.status,
+    line.paused_until
+  );
   const lineType =
     line.line_type === "other" && line.custom_line_type
       ? line.custom_line_type
@@ -77,89 +86,38 @@ export default async function ManageLinePage({
           <PageEyebrow icon={RefreshCw}>{t("eyebrow")}</PageEyebrow>
         </div>
 
-        <Surface className="mt-5 p-5 sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
-                {t("lineName")}
-              </p>
-              <h1 className="mt-1 break-words text-3xl font-semibold text-slate-950 dark:text-white sm:text-4xl">
-                {line.name}
-              </h1>
-            </div>
-            <span
-              className={`w-fit shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold ${
-                effectiveStatus === "active"
-                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-200"
-                  : effectiveStatus === "paused"
-                    ? "bg-amber-500/10 text-amber-700 dark:text-amber-200"
-                    : "bg-slate-500/10 text-slate-600 dark:text-slate-300"
-              }`}
-            >
-              {t(`lineStatus.${effectiveStatus}`)}
-            </span>
+        <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
+          <div className="min-w-0">
+            <LineManager
+              allowPause={line.allow_pause}
+              lineId={lineId}
+              lineStatus={effectiveStatus}
+              pausedUntil={effectiveStatus === "paused" ? line.paused_until : null}
+              questions={(questions ?? []) as Array<{ id: string; label: string; position: number }>}
+              entries={(entries ?? []) as ManagedEntry[]}
+            />
           </div>
-
-          <dl className="mt-5 grid gap-3 border-t border-slate-950/5 pt-5 sm:grid-cols-2 dark:border-white/10">
-            <div className="rounded-2xl bg-slate-950/[0.035] p-4 dark:bg-white/[0.06]">
-              <dt className="text-xs text-slate-500 dark:text-slate-400">
-                {t("lineType")}
-              </dt>
-              <dd className="mt-1 font-semibold text-slate-900 dark:text-white">
-                {lineType}
-              </dd>
-            </div>
-            <div className="rounded-2xl bg-slate-950/[0.035] p-4 dark:bg-white/[0.06]">
-              <dt className="text-xs text-slate-500 dark:text-slate-400">
-                {t("lineCode")}
-              </dt>
-              <dd className="mt-2 flex flex-wrap items-center justify-between gap-3">
-                <span className="select-all font-mono text-base font-bold tracking-[0.1em] text-slate-900 dark:text-white">
-                  {line.public_code}
-                </span>
-                <CopyLineCodeButton
-                  code={line.public_code}
-                  copiedLabel={t("codeCopied")}
-                  copyLabel={t("copyCode")}
-                />
-              </dd>
-            </div>
-            {line.location ? (
-              <div className="rounded-2xl bg-slate-950/[0.035] p-4 sm:col-span-2 dark:bg-white/[0.06]">
-                <dt className="text-xs text-slate-500 dark:text-slate-400">
-                  {t("location")}
-                </dt>
-                <dd className="mt-1 flex items-start gap-2 font-semibold text-slate-900 dark:text-white">
-                  <MapPin
-                    aria-hidden="true"
-                    className="mt-0.5 h-4 w-4 shrink-0 text-teal-600 dark:text-teal-300"
-                  />
-                  {line.location}
-                </dd>
-              </div>
-            ) : null}
-          </dl>
-        </Surface>
-        <LineJoinQrCard
-          code={line.public_code}
-          description={t("qr.description")}
-          downloadLabel={t("qr.download")}
-          lineCodeLabel={t("lineCode")}
-          lineName={line.name}
-          locale={locale}
-          posterFooter={t("qr.posterFooter")}
-          posterSubtitle={t("qr.posterSubtitle")}
-          printLabel={t("qr.print")}
-          title={t("qr.title")}
-        />
-        <div className="mt-8">
-          <LineManager
-            allowPause={line.allow_pause}
-            lineId={lineId}
+          <LineJoinQrCard
+            className="lg:sticky lg:top-6"
+            code={line.public_code}
+            copiedLabel={t("codeCopied")}
+            copyLabel={t("copyCode")}
+            description={t("qr.description")}
+            downloadLabel={t("qr.download")}
+            lineCodeLabel={t("lineCode")}
+            lineNameLabel={t("lineName")}
+            lineName={line.name}
             lineStatus={effectiveStatus}
-            pausedUntil={effectiveStatus === "paused" ? line.paused_until : null}
-            questions={(questions ?? []) as Array<{ id: string; label: string; position: number }>}
-            entries={(entries ?? []) as ManagedEntry[]}
+            lineStatusLabel={t(`lineStatus.${effectiveStatus}`)}
+            lineType={lineType}
+            lineTypeLabel={t("lineType")}
+            location={line.location}
+            locationLabel={t("location")}
+            locale={locale}
+            posterFooter={t("qr.posterFooter")}
+            posterSubtitle={t("qr.posterSubtitle")}
+            printLabel={t("qr.print")}
+            title={t("qr.title")}
           />
         </div>
       </div>

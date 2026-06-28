@@ -1,11 +1,9 @@
 import {
   BellRing,
   CalendarDays,
-  Clock3,
   MapPin,
   PauseCircle,
-  Settings2,
-  UsersRound
+  Settings2
 } from "lucide-react";
 import { getFormatter, getTranslations } from "next-intl/server";
 import Link from "next/link";
@@ -20,8 +18,6 @@ export type ManagedLine = {
   auto_notify: boolean;
   created_at: string;
   custom_line_type: string | null;
-  daily_capacity: number | null;
-  estimated_service_minutes: number | null;
   id: string;
   line_type: "clinic" | "event" | "other" | "restaurant" | "service";
   location: string | null;
@@ -123,41 +119,6 @@ export async function ManageLinesList({ lines, locale }: ManageLinesListProps) {
                 </div>
               </div>
             </div>
-
-            <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
-              <div className="flex gap-2 rounded-2xl bg-slate-950/[0.035] p-3 dark:bg-white/[0.06]">
-                <Clock3
-                  aria-hidden="true"
-                  className="mt-0.5 h-4 w-4 shrink-0 text-teal-600 dark:text-teal-300"
-                />
-                <div>
-                  <dt className="text-xs text-slate-500 dark:text-slate-400">
-                    {t("serviceTime")}
-                  </dt>
-                  <dd className="mt-1 font-semibold text-slate-800 dark:text-slate-100">
-                    {line.estimated_service_minutes
-                      ? t("minutes", {
-                          count: line.estimated_service_minutes
-                        })
-                      : t("notSet")}
-                  </dd>
-                </div>
-              </div>
-              <div className="flex gap-2 rounded-2xl bg-slate-950/[0.035] p-3 dark:bg-white/[0.06]">
-                <UsersRound
-                  aria-hidden="true"
-                  className="mt-0.5 h-4 w-4 shrink-0 text-teal-600 dark:text-teal-300"
-                />
-                <div>
-                  <dt className="text-xs text-slate-500 dark:text-slate-400">
-                    {t("dailyCapacity")}
-                  </dt>
-                  <dd className="mt-1 font-semibold text-slate-800 dark:text-slate-100">
-                    {line.daily_capacity ?? t("notSet")}
-                  </dd>
-                </div>
-              </div>
-            </dl>
 
             <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 border-t border-slate-950/5 pt-4 text-xs text-slate-500 dark:border-white/10 dark:text-slate-400">
               <span className="inline-flex items-center gap-1.5">

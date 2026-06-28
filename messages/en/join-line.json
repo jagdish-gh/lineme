@@ -111,10 +111,7 @@
         "other": "Other"
       },
       "waiting": "Currently waiting",
-      "people": "{count, plural, =0 {No one} =1 {1 person} other {# people}}",
-      "estimated": "Service time",
-      "minutes": "About {count} min each",
-      "notAvailable": "Not provided"
+      "people": "{count, plural, =0 {No one} =1 {1 person} other {# people}}"
     },
     "form": {
       "title": "A few details before you join",
@@ -152,7 +149,7 @@
       "notFound": "We could not find a line with that code. Check the code and try again.",
       "lookup": "The line could not be loaded right now. Please try again.",
       "line_not_active": "This line is not accepting new visitors right now.",
-      "line_at_capacity": "This line has reached its capacity for today.",
+      "line_at_capacity": "This line is full for today.",
       "required_answer_missing": "Complete all required questions before joining.",
       "join_failed": "You could not be added to the line. Please try again.",
       "leave_failed": "You could not leave the line right now. Please try again.",

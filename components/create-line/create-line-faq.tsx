@@ -8,6 +8,7 @@ const faqKeys = [
   "lineDetails",
   "otherType",
   "advanced",
+  "qrCode",
   "questions",
   "answerTypes",
   "multipleChoice",

@@ -14,9 +14,7 @@ import {
   PauseCircle,
   PencilLine,
   Settings2,
-  SlidersHorizontal,
-  Timer,
-  Users
+  SlidersHorizontal
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -92,37 +90,6 @@ export function CreateLineFields({ form, onChange }: CreateLineFieldsProps) {
           title={t("advanced.title")}
         >
           <div className="grid gap-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field
-                icon={Timer}
-                label={t("fields.estimatedMinutes")}
-                min={2}
-                max={60}
-                placeholder={t("placeholders.optionalNumber")}
-                type="number"
-                value={form.estimatedMinutes}
-                suffix={t("minutes")}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  onChange("estimatedMinutes", value === "" ? "" : Number(value));
-                }}
-              />
-              <Field
-                icon={Users}
-                label={t("fields.capacity")}
-                min={5}
-                max={250}
-                placeholder={t("placeholders.optionalNumber")}
-                type="number"
-                value={form.capacity}
-                suffix={t("people")}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  onChange("capacity", value === "" ? "" : Number(value));
-                }}
-              />
-            </div>
-
             <div className="grid gap-3 sm:grid-cols-2">
               <FormToggle
                 checked={form.autoNotify}
