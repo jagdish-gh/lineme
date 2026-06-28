@@ -5,7 +5,9 @@ import {
   CheckCircle2,
   CircleSlash2,
   Clock3,
+  LoaderCircle,
   MapPin,
+  MessageSquarePlus,
   RefreshCw,
   TicketCheck,
   UserMinus,
@@ -18,6 +20,7 @@ import { CopyLineCodeButton } from "@/components/manage-lines/copy-line-code-but
 import { useTicketRealtime } from "@/components/tickets/use-ticket-realtime";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Surface } from "@/components/ui/surface";
+import { MixpanelEvent, trackEvent } from "@/lib/analytics/mixpanel";
 import { type SavedJoinedLine } from "@/lib/lines/public-line";
 import { cn } from "@/lib/utils";
 
@@ -64,6 +67,8 @@ export function TicketHistory({ tickets }: TicketHistoryProps) {
   const [loadingBrowserTickets, setLoadingBrowserTickets] = useState(true);
   const [refreshingTicketId, setRefreshingTicketId] = useState("");
   const [leavingTicketId, setLeavingTicketId] = useState("");
+  const [respondingRequestId, setRespondingRequestId] = useState("");
+  const [requestResponses, setRequestResponses] = useState<Record<string, string>>({});
   const [ticketToLeave, setTicketToLeave] = useState<SavedJoinedLine | null>(
     null
   );
@@ -295,6 +300,58 @@ export function TicketHistory({ tickets }: TicketHistoryProps) {
     }
   }
 
+  async function respondToRequest(ticket: SavedJoinedLine, requestId: string) {
+    const responseText = requestResponses[requestId]?.trim();
+
+    if (!responseText) {
+      setRefreshErrors((current) => ({
+        ...current,
+        [ticket.ticket.entryId]: t("extraInfo.responseRequired")
+      }));
+      return;
+    }
+
+    setRespondingRequestId(requestId);
+    setRefreshErrors((current) => ({ ...current, [ticket.ticket.entryId]: "" }));
+
+    try {
+      const response = await fetch("/api/lines/public/ticket/request", {
+        body: JSON.stringify({
+          requestId,
+          response: responseText,
+          ticketToken: ticket.ticket.ticketToken
+        }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST"
+      });
+
+      if (!response.ok) {
+        throw new Error("Info request response failed");
+      }
+
+      setRequestResponses((current) => {
+        const next = { ...current };
+        delete next[requestId];
+        return next;
+      });
+      await refreshTicketByToken(
+        ticket.ticket.ticketToken,
+        ticket.ticket.entryId,
+        false
+      );
+      trackEvent(MixpanelEvent.AdditionalInfoSubmitted, {
+        line_id: ticket.line.id
+      });
+    } catch {
+      setRefreshErrors((current) => ({
+        ...current,
+        [ticket.ticket.entryId]: t("extraInfo.responseFailed")
+      }));
+    } finally {
+      setRespondingRequestId("");
+    }
+  }
+
   return (
     <>
       <div
@@ -346,6 +403,10 @@ export function TicketHistory({ tickets }: TicketHistoryProps) {
             const isActiveTicket = ["waiting", "called"].includes(
               ticket.ticket.status ?? "waiting"
             );
+            const pendingRequests =
+              ticket.ticket.requests?.filter(
+                (request) => request.status === "pending"
+              ) ?? [];
             const CategoryIcon =
               category === "pending"
                 ? Clock3
@@ -489,6 +550,62 @@ export function TicketHistory({ tickets }: TicketHistoryProps) {
                     </div>
                   </div>
                 </div>
+
+                {pendingRequests.length ? (
+                  <div className="mt-3 rounded-2xl border border-violet-200 bg-violet-50/70 p-4 dark:border-violet-400/20 dark:bg-violet-400/10">
+                    <div className="flex items-start gap-3">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-violet-500/10 text-violet-700 dark:text-violet-200">
+                        <MessageSquarePlus aria-hidden="true" className="h-4 w-4" />
+                      </span>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-950 dark:text-white">
+                          {t("extraInfo.title")}
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-slate-600 dark:text-slate-300">
+                          {t("extraInfo.description")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4 space-y-4">
+                      {pendingRequests.map((request) => (
+                        <div key={request.id}>
+                          <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                            {request.prompt}
+                          </p>
+                          <textarea
+                            rows={3}
+                            maxLength={1000}
+                            value={requestResponses[request.id] ?? ""}
+                            onChange={(event) =>
+                              setRequestResponses((current) => ({
+                                ...current,
+                                [request.id]: event.target.value
+                              }))
+                            }
+                            placeholder={t("extraInfo.placeholder")}
+                            className="mt-3 w-full resize-none rounded-xl border border-slate-950/10 bg-white px-3 py-2.5 text-sm text-slate-950 outline-none focus:border-teal-500/60 focus:ring-4 focus:ring-teal-500/10 dark:border-white/10 dark:bg-slate-950/30 dark:text-white"
+                          />
+                          <button
+                            type="button"
+                            disabled={respondingRequestId === request.id}
+                            onClick={() => void respondToRequest(ticket, request.id)}
+                            className="mt-3 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700 disabled:cursor-wait disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 sm:w-auto dark:bg-teal-300 dark:text-slate-950 dark:hover:bg-teal-200"
+                          >
+                            {respondingRequestId === request.id ? (
+                              <LoaderCircle
+                                aria-hidden="true"
+                                className="h-4 w-4 animate-spin"
+                              />
+                            ) : null}
+                            {respondingRequestId === request.id
+                              ? t("extraInfo.sending")
+                              : t("extraInfo.submit")}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
 
                 {refreshErrors[ticket.ticket.entryId] ? (
                   <p

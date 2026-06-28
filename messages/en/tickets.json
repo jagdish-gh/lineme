@@ -45,6 +45,15 @@
     "refresh": "Refresh",
     "refreshing": "Refreshing...",
     "refreshError": "This ticket could not be refreshed. Please try again.",
+    "extraInfo": {
+      "title": "The team needs more information",
+      "description": "Reply here so the line manager can continue helping you.",
+      "placeholder": "Type your response",
+      "submit": "Send response",
+      "sending": "Sending...",
+      "responseRequired": "Enter a response before sending.",
+      "responseFailed": "Your response could not be sent. Please try again."
+    },
     "leave": {
       "button": "Leave line",
       "title": "Leave this line?",
