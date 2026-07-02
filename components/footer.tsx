@@ -70,7 +70,7 @@ export function Footer() {
             {t("contact")}
           </h2>
           <a
-            href={`mailto:${brand.contactEmail}`}
+            href={`mailto:${brand.contactMailtoEmail}`}
             className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500 dark:text-slate-300 dark:hover:text-white"
           >
             <Mail aria-hidden="true" className="h-4 w-4 text-teal-600 dark:text-teal-300" />

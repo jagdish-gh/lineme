@@ -73,7 +73,20 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
         intro={t("intro")}
         sections={sectionKeys.map((key) => ({
           title: t(`sections.${key}.title`),
-          body: t(`sections.${key}.body`, { email: brand.contactEmail })
+          body:
+            key === "contact"
+              ? t.rich(`sections.${key}.body`, {
+                  email: brand.contactEmail,
+                  emailLink: (chunks) => (
+                    <a
+                      href={`mailto:${brand.contactMailtoEmail}`}
+                      className="font-semibold text-teal-700 underline decoration-teal-500/40 underline-offset-4 transition hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500 dark:text-teal-200 dark:hover:text-white"
+                    >
+                      {chunks}
+                    </a>
+                  )
+                })
+              : t(`sections.${key}.body`)
         }))}
         title={t("title")}
       />

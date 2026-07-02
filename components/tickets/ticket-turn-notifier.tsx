@@ -12,6 +12,7 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useCreatorSession } from "@/components/auth/use-creator-session";
 import { useTicketRealtime } from "@/components/tickets/use-ticket-realtime";
 import { type SavedJoinedLine } from "@/lib/lines/public-line";
 
@@ -102,6 +103,8 @@ export function TicketTurnNotifier() {
   const [tickets, setTickets] = useState<SavedJoinedLine[]>([]);
   const [calledTicket, setCalledTicket] = useState<SavedJoinedLine | null>(null);
   const notifiedIdsRef = useRef<Set<string> | null>(null);
+  const { loading: authLoading, user } = useCreatorSession();
+  const accountUserId = user?.id;
 
   const notifyTicket = useCallback((ticket: SavedJoinedLine) => {
     notifiedIdsRef.current ??= getNotifiedTicketIds();
@@ -171,24 +174,26 @@ export function TicketTurnNotifier() {
       (ticket): ticket is SavedJoinedLine => Boolean(ticket)
     );
 
-    try {
-      const response = await fetch("/api/lines/public/tickets", {
-        cache: "no-store"
-      });
+    if (!authLoading && accountUserId) {
+      try {
+        const response = await fetch("/api/lines/public/tickets", {
+          cache: "no-store"
+        });
 
-      if (response.ok) {
-        const result = (await response.json()) as {
-          tickets?: SavedJoinedLine[];
-        };
+        if (response.ok) {
+          const result = (await response.json()) as {
+            tickets?: SavedJoinedLine[];
+          };
 
-        loadedTickets.push(...(result.tickets ?? []));
+          loadedTickets.push(...(result.tickets ?? []));
+        }
+      } catch {
+        // Offline moments can still rely on device tickets.
       }
-    } catch {
-      // Anonymous users and offline moments can still rely on device tickets.
     }
 
     mergeTickets(loadedTickets);
-  }, [mergeTickets, refreshTicketByToken]);
+  }, [accountUserId, authLoading, mergeTickets, refreshTicketByToken]);
 
   useEffect(() => {
     void loadTickets();

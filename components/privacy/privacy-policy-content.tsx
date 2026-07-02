@@ -1,10 +1,11 @@
 import { PageEyebrow } from "@/components/ui/page-eyebrow";
 import { Surface } from "@/components/ui/surface";
 import { CalendarDays, LockKeyhole } from "lucide-react";
+import type { ReactNode } from "react";
 
 type PrivacySection = {
   title: string;
-  body: string;
+  body: ReactNode;
 };
 
 type PrivacyPolicyContentProps = {

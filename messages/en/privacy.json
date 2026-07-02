@@ -31,7 +31,7 @@
       },
       "contact": {
         "title": "Contact",
-        "body": "For privacy questions, contact LineME at {email}."
+        "body": "For privacy questions, contact LineME at <emailLink>{email}</emailLink>."
       }
     }
   }
