@@ -1,4 +1,5 @@
 import { ArrowLeft, RefreshCw } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
@@ -14,6 +15,15 @@ import { getEffectiveLineStatus } from "@/lib/lines/manage-line";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    robots: {
+      index: false,
+      follow: false
+    }
+  };
+}
 
 export default async function ManageLinePage({
   params

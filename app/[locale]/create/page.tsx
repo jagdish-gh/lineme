@@ -1,6 +1,6 @@
 import { CreateLineForm } from "@/components/create-line/create-line-form";
 import { locales, type Locale } from "@/i18n/routing";
-import { getLocaleUrl, siteConfig } from "@/lib/seo";
+import { getAlternates, getLocaleUrl, siteConfig } from "@/lib/seo";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -22,23 +22,16 @@ export async function generateMetadata({
 
   const t = await getTranslations({ locale, namespace: "createLine.metadata" });
   const typedLocale = locale as Locale;
+  const url = getLocaleUrl(typedLocale, "/create");
 
   return {
     title: t("title"),
     description: t("description"),
-    alternates: {
-      canonical: `${getLocaleUrl(typedLocale)}/create`,
-      languages: Object.fromEntries(
-        locales.map((availableLocale) => [
-          availableLocale,
-          `${getLocaleUrl(availableLocale)}/create`
-        ])
-      )
-    },
+    alternates: getAlternates(typedLocale, "/create"),
     openGraph: {
       title: t("title"),
       description: t("description"),
-      url: `${getLocaleUrl(typedLocale)}/create`,
+      url,
       siteName: siteConfig.name,
       locale: typedLocale,
       type: "website"

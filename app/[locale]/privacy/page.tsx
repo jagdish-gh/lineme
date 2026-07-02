@@ -1,7 +1,7 @@
 import { PrivacyPolicyContent } from "@/components/privacy/privacy-policy-content";
 import { locales, type Locale } from "@/i18n/routing";
 import { brand } from "@/lib/brand";
-import { getLocaleUrl, siteConfig } from "@/lib/seo";
+import { getAlternates, getLocaleUrl, siteConfig } from "@/lib/seo";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -30,20 +30,12 @@ export async function generateMetadata({ params }: PrivacyPageProps): Promise<Me
 
   const t = await getTranslations({ locale, namespace: "privacy.metadata" });
   const typedLocale = locale as Locale;
-  const url = `${getLocaleUrl(typedLocale)}/privacy`;
+  const url = getLocaleUrl(typedLocale, "/privacy");
 
   return {
     title: t("title"),
     description: t("description"),
-    alternates: {
-      canonical: url,
-      languages: Object.fromEntries(
-        locales.map((availableLocale) => [
-          availableLocale,
-          `${getLocaleUrl(availableLocale)}/privacy`
-        ])
-      )
-    },
+    alternates: getAlternates(typedLocale, "/privacy"),
     openGraph: {
       title: t("title"),
       description: t("description"),

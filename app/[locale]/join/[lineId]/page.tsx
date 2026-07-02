@@ -30,7 +30,11 @@ export async function generateMetadata({
     title: t("title"),
     description: t("description"),
     alternates: {
-      canonical: `${getLocaleUrl(locale as Locale)}/join/${code}`
+      canonical: getLocaleUrl(locale as Locale, `/join/${code}`)
+    },
+    robots: {
+      index: false,
+      follow: false
     }
   };
 }

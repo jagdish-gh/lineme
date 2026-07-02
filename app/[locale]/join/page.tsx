@@ -8,7 +8,7 @@ import { JoinLineExperience } from "@/components/join-line/join-line-experience"
 import { JoinLineFaq } from "@/components/join-line/join-line-faq";
 import { PageEyebrow } from "@/components/ui/page-eyebrow";
 import { locales, type Locale } from "@/i18n/routing";
-import { getLocaleUrl } from "@/lib/seo";
+import { getAlternates, getLocaleUrl, siteConfig } from "@/lib/seo";
 
 type JoinLinePageProps = {
   params: Promise<{ locale: string }>;
@@ -24,12 +24,25 @@ export async function generateMetadata({
   }
 
   const t = await getTranslations({ locale, namespace: "joinLine.metadata" });
+  const typedLocale = locale as Locale;
+  const url = getLocaleUrl(typedLocale, "/join");
 
   return {
     title: t("title"),
     description: t("description"),
-    alternates: {
-      canonical: `${getLocaleUrl(locale as Locale)}/join`
+    alternates: getAlternates(typedLocale, "/join"),
+    openGraph: {
+      title: t("title"),
+      description: t("description"),
+      url,
+      siteName: siteConfig.name,
+      locale: typedLocale,
+      type: "website"
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t("title"),
+      description: t("description")
     }
   };
 }
