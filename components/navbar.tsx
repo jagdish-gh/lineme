@@ -20,6 +20,7 @@ export function Navbar() {
   const navLinks = [
     { href: `/${locale}/join`, label: t("join") },
     { href: `/${locale}/create`, label: t("create") },
+    { href: `/${locale}/help`, label: t("help") },
     { href: `/${locale}/manage`, label: t("manage") }
   ];
 

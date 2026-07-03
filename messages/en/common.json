@@ -3,6 +3,7 @@
     "manage": "Manage queues",
     "join": "Join queue",
     "create": "Create queue",
+    "help": "Help",
     "menu": "Open menu",
     "close": "Close menu",
     "language": "Language",
@@ -36,6 +37,7 @@
     "links": {
       "join": "Join a queue",
       "create": "Create a queue",
+      "help": "Help center",
       "manage": "Manage queues",
       "privacy": "Privacy policy"
     },

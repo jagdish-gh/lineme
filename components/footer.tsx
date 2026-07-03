@@ -7,7 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Logo } from "@/components/logo/Logo";
 import { brand } from "@/lib/brand";
 
-const footerLinkKeys = ["join", "create", "manage"] as const;
+const footerLinkKeys = ["join", "create", "help", "manage"] as const;
 const legalLinkKeys = ["privacy"] as const;
 
 export function Footer() {
@@ -18,6 +18,7 @@ export function Footer() {
   const links = {
     join: `/${locale}/join`,
     create: `/${locale}/create`,
+    help: `/${locale}/help`,
     manage: `/${locale}/manage`,
     privacy: `/${locale}/privacy`
   };

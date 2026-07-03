@@ -1,8 +1,9 @@
 import { defaultLocale, locales, type Locale } from "@/i18n/routing";
 import { brand } from "@/lib/brand";
+import { helpContent, getHelpPath } from "@/lib/help-content";
 
 type PublicRoute = {
-  path: "" | "/create" | "/join" | "/privacy";
+  path: string;
   changeFrequency: "monthly" | "weekly";
   priority: number;
 };
@@ -43,7 +44,17 @@ export const publicSitemapRoutes: PublicRoute[] = [
     path: "/privacy",
     changeFrequency: "monthly",
     priority: 0.4
-  }
+  },
+  {
+    path: "/help",
+    changeFrequency: "weekly",
+    priority: 0.8
+  },
+  ...helpContent[defaultLocale].articles.map((article) => ({
+    path: getHelpPath(article.slug),
+    changeFrequency: "monthly" as const,
+    priority: 0.7
+  }))
 ];
 
 export function getLocalePath(locale: Locale, path = "") {
