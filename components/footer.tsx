@@ -1,14 +1,27 @@
 "use client";
 
-import { Mail, MapPin, ShieldCheck } from "lucide-react";
+import { Instagram, Linkedin, Mail, MapPin, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 
 import { Logo } from "@/components/logo/Logo";
+import { SocialLink } from "@/components/ui/social-link";
 import { brand } from "@/lib/brand";
 
 const footerLinkKeys = ["join", "create", "help", "manage"] as const;
 const legalLinkKeys = ["privacy"] as const;
+const socialLinks = [
+  {
+    href: "https://www.instagram.com/lineme.in/",
+    icon: Instagram,
+    label: "LineMe on Instagram"
+  },
+  {
+    href: "https://www.linkedin.com/company/lineme-official",
+    icon: Linkedin,
+    label: "LineMe on LinkedIn"
+  }
+] as const;
 
 export function Footer() {
   const t = useTranslations("footer");
@@ -80,6 +93,11 @@ export function Footer() {
           <p className="mt-5 text-xs leading-5 text-slate-500 dark:text-slate-400">
             {t("availability")}
           </p>
+          <div className="mt-4 flex gap-2">
+            {socialLinks.map((socialLink) => (
+              <SocialLink key={socialLink.href} {...socialLink} />
+            ))}
+          </div>
         </div>
 
         <div>
