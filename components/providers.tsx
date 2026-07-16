@@ -3,6 +3,7 @@
 import { ThemeProvider } from "next-themes";
 
 import { MixpanelIdentity } from "@/components/analytics/mixpanel-identity";
+import { ServiceWorkerRegistration } from "@/components/pwa/service-worker-registration";
 import {
   AuthCodeRedirect,
   PendingAccountJoinRedirect
@@ -20,6 +21,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       storageKey="lineme-theme"
     >
       <MixpanelIdentity />
+      <ServiceWorkerRegistration />
       <AuthCodeRedirect />
       <PendingAccountJoinRedirect />
       <PushNotificationPrompt />

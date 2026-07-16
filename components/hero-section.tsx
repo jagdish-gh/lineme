@@ -105,7 +105,7 @@ export function HeroSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.45, ease: "easeOut" }}
-            className="rounded-[2rem] border border-white/60 bg-white/60 p-6 shadow-sm backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:bg-white/85 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/15"
+            className="rounded-[2rem] border border-white/60 bg-white/60 p-6  hover:bg-white/85 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/15"
           >
             <div className="mb-5 grid h-11 w-11 place-items-center rounded-2xl bg-teal-500/10 text-teal-700 dark:bg-teal-300/10 dark:text-teal-200">
               <CheckCircle2 aria-hidden="true" className="h-5 w-5" />

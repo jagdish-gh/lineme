@@ -113,8 +113,8 @@ export async function ManageLinesList({ lines, locale }: ManageLinesListProps) {
                   <ShareLineButton code={line.public_code} name={line.name} />
                   <CopyLineCodeButton
                     code={line.public_code}
-                    copiedLabel={t("copied")}
-                    copyLabel={t("copyCode")}
+                    // copiedLabel={t("copied")}
+                    // copyLabel={t("copyCode")}
                   />
                 </div>
               </div>

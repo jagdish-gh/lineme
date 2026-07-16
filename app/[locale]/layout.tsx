@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -20,6 +20,14 @@ type LocaleLayoutProps = {
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
+
+export const viewport: Viewport = {
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
+    { media: "(prefers-color-scheme: dark)", color: "#030712" }
+  ]
+};
 
 export async function generateMetadata({
   params
@@ -43,6 +51,31 @@ export async function generateMetadata({
     creator: siteConfig.creator,
     publisher: siteConfig.name,
     keywords: siteConfig.keywords,
+    icons: {
+      icon: [
+        {
+          url: "/favicon-96x96.png",
+          type: "image/png",
+          sizes: "96x96"
+        },
+        {
+          url: "/favicon.svg",
+          type: "image/svg+xml"
+        }
+      ],
+      shortcut: "/favicon.ico",
+      apple: {
+        url: "/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png"
+      }
+    },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: siteConfig.name
+    },
+    manifest: "/site.webmanifest",
     alternates,
     openGraph: {
       title: t("title"),

@@ -454,8 +454,8 @@ export function TicketHistory({ tickets }: TicketHistoryProps) {
                     </span>
                     <CopyLineCodeButton
                       code={ticket.line.public_code}
-                      copiedLabel={t("codeCopied")}
-                      copyLabel={t("copyCode")}
+                      // copiedLabel={t("codeCopied")}
+                      // copyLabel={t("copyCode")}
                     />
                   </div>
                 </div>

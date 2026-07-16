@@ -296,8 +296,8 @@ export function LineJoinQrCard({
                 </span>
                 <CopyLineCodeButton
                   code={code}
-                  copiedLabel={copiedLabel}
-                  copyLabel={copyLabel}
+                  // copiedLabel={copiedLabel}
+                  // copyLabel={copyLabel}
                 />
               </dd>
             </div>

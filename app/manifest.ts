@@ -1,7 +1,5 @@
 import type { MetadataRoute } from "next";
 
-import { siteConfig } from "@/lib/seo";
-
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "LineME - Queue Management App",
@@ -14,18 +12,32 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["business", "productivity", "utilities"],
     lang: "en",
     scope: "/",
-    id: siteConfig.url,
+    id: "/",
     icons: [
-      // {
-      //   src: "/icon.png",
-      //   sizes: "512x512",
-      //   type: "image/png"
-      // },
-      // {
-      //   src: "/apple-icon.png",
-      //   sizes: "180x180",
-      //   type: "image/png"
-      // }
+      {
+        src: "/web-app-manifest-192x192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any"
+      },
+      {
+        src: "/web-app-manifest-192x192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "maskable"
+      },
+      {
+        src: "/web-app-manifest-512x512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any"
+      },
+      {
+        src: "/web-app-manifest-512x512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable"
+      }
     ]
   };
 }

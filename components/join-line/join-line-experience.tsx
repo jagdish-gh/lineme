@@ -3,14 +3,11 @@
 import {
   ArrowLeft,
   ArrowRight,
-  Check,
   CheckCircle2,
-  Copy,
   LoaderCircle,
   MapPin,
   RefreshCw,
   Search,
-  Share2,
   TicketCheck,
   UserMinus,
   UsersRound
@@ -82,7 +79,6 @@ export function JoinLineExperience({
   const [qrError, setQrError] = useState("");
   const [joinError, setJoinError] = useState("");
   const [ticketError, setTicketError] = useState("");
-  const [copied, setCopied] = useState(false);
   const detailMode = normalizeLineCode(initialCode).length === 10;
   const [lineDiscoveryMethod, setLineDiscoveryMethod] =
     useState<LineDiscoveryMethod>(detailMode ? "share_link" : "search");
@@ -407,32 +403,6 @@ export function JoinLineExperience({
   function handleScannedCode(scannedCode: string) {
     setCode(scannedCode);
     void findLine(scannedCode, "qr");
-  }
-
-  async function copyShareLink() {
-    if (!line) {
-      return;
-    }
-
-    const shareUrl = `${window.location.origin}/${locale}/join/${line.public_code}`;
-    await navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 2000);
-  }
-
-  async function shareLine() {
-    if (!line) {
-      return;
-    }
-
-    const url = `${window.location.origin}/${locale}/join/${line.public_code}`;
-
-    if (navigator.share) {
-      await navigator.share({ text: t("shareText", { name: line.name }), url });
-      return;
-    }
-
-    await copyShareLink();
   }
 
   async function refreshTicket() {
@@ -845,10 +815,10 @@ export function JoinLineExperience({
           </Surface>
         ) : line ? (
           <Surface className="overflow-hidden">
-            <div className="border-b border-slate-950/5 p-5 sm:p-7 dark:border-white/10">
-              <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="border-b border-slate-950/5 p-4 sm:p-5 dark:border-white/10">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <span
-                  className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                  className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
                     line.status === "active"
                       ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-200"
                       : "bg-amber-500/10 text-amber-700 dark:text-amber-200"
@@ -862,71 +832,51 @@ export function JoinLineExperience({
                   </span>
                   <CopyLineCodeButton
                     code={line.public_code}
-                    copiedLabel={t("line.codeCopied")}
-                    copyLabel={t("line.copyCode")}
+                    // copiedLabel={t("line.codeCopied")}
+                    // copyLabel={t("line.copyCode")}
                   />
                 </div>
               </div>
-              <p className="mt-4 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
-                {t("line.nameLabel")}
-              </p>
-              <h2 className="mt-1 text-2xl font-semibold text-slate-950 dark:text-white sm:text-3xl">
-                {line.name}
-              </h2>
-              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                {t("line.typeLabel")}:{" "}
-                <span className="font-semibold text-slate-900 dark:text-white">
-                  {line.line_type === "other" && line.custom_line_type
-                    ? line.custom_line_type
-                    : t(`line.types.${line.line_type}`)}
-                </span>
-              </p>
-              {line.location ? (
-                <p className="mt-2 flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
-                  <MapPin
-                    aria-hidden="true"
-                    className="mt-0.5 h-4 w-4 shrink-0 text-teal-600 dark:text-teal-300"
-                  />
-                  {line.location}
-                </p>
-              ) : null}
-              <div className="mt-5 grid gap-3">
-                <div className="flex gap-2 rounded-2xl bg-slate-950/[0.035] p-3 dark:bg-white/[0.06]">
+              <div className="mt-3 flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
+                    {t("line.nameLabel")}
+                  </p>
+                  <h2 className="mt-0.5 text-xl font-semibold leading-tight text-slate-950 dark:text-white sm:text-2xl">
+                    {line.name}
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                    {t("line.typeLabel")}:{" "}
+                    <span className="font-semibold text-slate-900 dark:text-white">
+                      {line.line_type === "other" && line.custom_line_type
+                        ? line.custom_line_type
+                        : t(`line.types.${line.line_type}`)}
+                    </span>
+                  </p>
+                  {line.location ? (
+                    <p className="mt-1.5 flex items-start gap-1.5 text-sm text-slate-600 dark:text-slate-300">
+                      <MapPin
+                        aria-hidden="true"
+                        className="mt-0.5 h-3.5 w-3.5 shrink-0 text-teal-600 dark:text-teal-300"
+                      />
+                      {line.location}
+                    </p>
+                  ) : null}
+                </div>
+                <div className="flex shrink-0 items-center gap-2 rounded-xl bg-slate-950/[0.035] px-3 py-2 dark:bg-white/[0.06]">
                   <UsersRound
                     aria-hidden="true"
-                    className="mt-0.5 h-4 w-4 text-teal-600 dark:text-teal-300"
+                    className="h-3.5 w-3.5 shrink-0 text-teal-600 dark:text-teal-300"
                   />
-                  <div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <div className="text-right">
+                    <p className="text-[0.6875rem] text-slate-500 dark:text-slate-400">
                       {t("line.waiting")}
                     </p>
-                    <p className="mt-1 font-semibold text-slate-900 dark:text-white">
+                    <p className="mt-0.5 text-xs font-semibold text-slate-900 dark:text-white">
                       {t("line.people", { count: line.waiting_count })}
                     </p>
                   </div>
                 </div>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={shareLine}
-                  className="inline-flex min-h-9 items-center gap-2 rounded-xl border border-slate-950/10 bg-white/75 px-3 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-white dark:border-white/10 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15"
-                >
-                  <Share2 aria-hidden="true" className="h-3.5 w-3.5" />
-                  {t("share")}
-                </button>
-                <button
-                  type="button"
-                  onClick={copyShareLink}
-                  className="inline-flex min-h-9 items-center gap-2 rounded-xl border border-slate-950/10 bg-white/75 px-3 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-white dark:border-white/10 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15"
-                >
-                  {copied ? (
-                    <Check aria-hidden="true" className="h-3.5 w-3.5" />
-                  ) : (
-                    <Copy aria-hidden="true" className="h-3.5 w-3.5" />
-                  )}
-                  {copied ? t("copied") : t("copyLink")}
-                </button>
               </div>
             </div>
 
