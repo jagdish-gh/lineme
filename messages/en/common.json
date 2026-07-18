@@ -11,6 +11,48 @@
     "themeChange": "Current theme: {current}. Change to {next}",
     "login": "Log in",
     "signedInUser": "Signed-in user",
+    "notifications": {
+      "label": "Notifications",
+      "labelWithUnread": "Notifications, {count} unread",
+      "title": "Notifications",
+      "unread": "{count, plural, =1 {1 unread notification} other {# unread notifications}}",
+      "markAllRead": "Mark all read",
+      "loading": "Loading notifications",
+      "error": "Notifications could not be loaded right now.",
+      "retry": "Try again",
+      "emptyTitle": "You’re all caught up",
+      "emptyDescription": "Queue updates and requests will appear here.",
+      "types": {
+        "line_joined": {
+          "title": "New member in {lineName}",
+          "description": "Someone joined your queue."
+        },
+        "member_called": {
+          "title": "It’s your turn at {lineName}",
+          "description": "The team is ready for you now."
+        },
+        "member_served": {
+          "title": "Completed at {lineName}",
+          "description": "Your visit has been marked as served."
+        },
+        "member_no_show": {
+          "title": "Marked no-show at {lineName}",
+          "description": "The team marked this ticket as no-show."
+        },
+        "member_cancelled": {
+          "title": "Ticket closed at {lineName}",
+          "description": "This ticket is no longer active."
+        },
+        "additional_info_requested": {
+          "title": "Information needed for {lineName}",
+          "description": "The team asked you to provide more information."
+        },
+        "additional_info_submitted": {
+          "title": "New response in {lineName}",
+          "description": "A member submitted the requested information."
+        }
+      }
+    },
     "account": {
       "profile": "View profile",
       "tickets": "My tickets",

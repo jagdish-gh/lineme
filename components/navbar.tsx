@@ -7,6 +7,7 @@ import { UserAvatar } from "@/components/auth/user-avatar";
 import { useCreatorSession } from "@/components/auth/use-creator-session";
 import { HamburgerMenu } from "@/components/hamburger-menu";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { NotificationMenu } from "@/components/notifications/notification-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "./logo/Logo";
 
@@ -63,6 +64,7 @@ export function Navbar() {
               {t("login")}
             </Link>
           ) : null}
+          {user ? <NotificationMenu key={user.id} user={user} /> : null}
           <UserAvatar label={t("signedInUser")} user={user} />
           <HamburgerMenu />
         </div>

@@ -11,6 +11,48 @@
     "themeChange": "वर्तमान थीम: {current}। {next} में बदलें",
     "login": "लॉग इन",
     "signedInUser": "साइन इन किया हुआ उपयोगकर्ता",
+    "notifications": {
+      "label": "सूचनाएं",
+      "labelWithUnread": "सूचनाएं, {count} अपठित",
+      "title": "सूचनाएं",
+      "unread": "{count, plural, =1 {1 अपठित सूचना} other {# अपठित सूचनाएं}}",
+      "markAllRead": "सभी को पढ़ा हुआ करें",
+      "loading": "सूचनाएं लोड हो रही हैं",
+      "error": "सूचनाएं अभी लोड नहीं हो सकीं।",
+      "retry": "फिर कोशिश करें",
+      "emptyTitle": "आपने सभी अपडेट देख लिए हैं",
+      "emptyDescription": "कतार के अपडेट और अनुरोध यहां दिखाई देंगे।",
+      "types": {
+        "line_joined": {
+          "title": "{lineName} में नया सदस्य",
+          "description": "कोई आपकी कतार में शामिल हुआ है।"
+        },
+        "member_called": {
+          "title": "{lineName} में आपकी बारी है",
+          "description": "टीम अब आपके लिए तैयार है।"
+        },
+        "member_served": {
+          "title": "{lineName} में सेवा पूरी हुई",
+          "description": "आपकी विज़िट को पूरा किया गया है।"
+        },
+        "member_no_show": {
+          "title": "{lineName} में अनुपस्थित चिह्नित",
+          "description": "टीम ने इस टिकट को अनुपस्थित चिह्नित किया है।"
+        },
+        "member_cancelled": {
+          "title": "{lineName} का टिकट बंद हुआ",
+          "description": "यह टिकट अब सक्रिय नहीं है।"
+        },
+        "additional_info_requested": {
+          "title": "{lineName} के लिए जानकारी चाहिए",
+          "description": "टीम ने आपसे अधिक जानकारी मांगी है।"
+        },
+        "additional_info_submitted": {
+          "title": "{lineName} में नया जवाब",
+          "description": "एक सदस्य ने मांगी गई जानकारी भेज दी है।"
+        }
+      }
+    },
     "account": {
       "profile": "प्रोफाइल देखें",
       "tickets": "मेरे टिकट",
